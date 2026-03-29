@@ -339,7 +339,7 @@
         const box = document.getElementById('question-box');
         document.getElementById('review-box').style.display = 'none';
         
-        let section = idx < 12 ? "PHẦN I. TRẮC NGHIỆM" : (idx < 16 ? "PHẦN II. ĐÚNG / SAI" : "PHẦN III. TRẢ LỜI NGẮN");
+        let section = idx < 12 ? "PHẦN I. TRẮC NGHIỆM KHÁCH QUAN DẠNG ĐA LỰA CHỌN " : (idx < 16 ? "PHẦN II. TRẮC NGHIỆM KHÁCH QUAN DẠNG ĐÚNG / SAI" : "PHẦN III. TRẮC NGHIỆM KHÁCH QUAN DẠNG TRẢ LỜI NGẮN");
         let headerHtml = `<div class="question-header"><span>${section}</span><span>CÂU ${idx+1}</span></div>`;
         let contentHtml = `<div class="question-text">${q.question || q.context}</div>`;
         
