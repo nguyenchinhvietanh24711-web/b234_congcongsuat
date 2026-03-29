@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ôn tập KHTN 9: Năng lượng và Công - THCS Thủy Phương</title>
+    <!-- MathJax để hiển thị công thức vật lý chuẩn xác -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
@@ -69,7 +70,7 @@
         .vn-flag::after { content: "★"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--vn-yellow); font-size: 9px; }
 
         .question-header { font-size: 1.3rem; font-weight: 800; color: var(--secondary-color); margin-bottom: 0.8rem; padding-bottom: 0.6rem; border-bottom: 2px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
-        .question-text { font-size: 1.15rem; line-height: 1.6; margin-bottom: 1.5rem; color: #1e293b; font-weight: 500; text-align: left; }
+        .question-text { font-size: 1.15rem; line-height: 1.6; margin-bottom: 1.5rem; color: #1e293b; font-weight: 500; text-align: left; max-width: 100%; overflow-x: auto; }
 
         .option-item { padding: 1rem; border: 2px solid #f1f5f9; border-radius: 12px; cursor: pointer; margin-bottom: 0.8rem; transition: 0.2s; font-size: 1.05rem; background: #fff; display: flex; align-items: center; gap: 10px; text-align: left; }
         .option-item:hover { background-color: #f8fafc; border-color: #cbd5e1; }
@@ -91,61 +92,30 @@
         .btn-warning { background-color: var(--warning); color: white; }
         .btn-star.used { opacity: 0.5; cursor: not-allowed; }
 
-        #review-box { margin-top: 1rem; padding: 1.2rem; background: #fff7ed; border-left: 6px solid var(--warning); border-radius: 12px; display: none; animation: slideIn 0.3s ease; text-align: left; }
+        #review-box { margin-top: 1rem; padding: 1.2rem; background: #fff7ed; border-left: 6px solid var(--warning); border-radius: 12px; display: none; animation: slideIn 0.3s ease; text-align: left; max-width: 100%; overflow-x: auto; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; transform: translateX(0); } }
         
         #toast { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 0.8rem 1.5rem; border-radius: 40px; z-index: 10001; display: none; font-weight: bold; box-shadow: 0 8px 20px rgba(0,0,0,0.15); font-size: 0.9rem; }
 
         /* History Review Cards */
         .history-card { margin-bottom: 2rem; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 15px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.02); text-align: left; }
-        .history-q-text { font-weight: 800; margin-bottom: 1rem; color: var(--primary-color); font-size: 1.1rem; line-height: 1.5; }
+        .history-q-text { font-weight: 800; margin-bottom: 1rem; color: var(--primary-color); font-size: 1.1rem; line-height: 1.5; max-width: 100%; overflow-x: auto; }
         .history-option { padding: 1rem; border-radius: 10px; margin-bottom: 0.6rem; border: 2px solid #f1f5f9; font-size: 1rem; display: flex; align-items: center; gap: 10px; }
         .history-option.correct { background-color: #dcfce7; border-color: #22c55e; color: #166534; font-weight: 600; }
         .history-option.wrong { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
-        .history-explanation { margin-top: 1.5rem; padding: 1.2rem; background: #eff6ff; border-radius: 12px; border-left: 6px solid var(--secondary-color); color: #1e40af; line-height: 1.7; font-size: 0.95rem; }
+        .history-explanation { margin-top: 1.5rem; padding: 1.2rem; background: #eff6ff; border-radius: 12px; border-left: 6px solid var(--secondary-color); color: #1e40af; line-height: 1.7; font-size: 0.95rem; max-width: 100%; overflow-x: auto; }
 
         footer { background: #f1f5f9; text-align: center; padding: 1rem; font-size: 0.8rem; color: #64748b; border-top: 1px solid #e2e8f0; margin-top: auto; }
 
-        /* ========================================================
-           BỔ SUNG CSS MEDIA QUERIES ĐỂ ĐÁP ỨNG MỌI KHUNG HÌNH (RESPONSIVE)
-           ======================================================== */
-        
-        /* Tablet & Mobile chung */
-        @media (max-width: 768px) {
-            /* Ép các thẻ div dùng inline style grid 2 cột về 1 cột */
-            div[style*="grid-template-columns:1fr 1fr"] {
-                grid-template-columns: 1fr !important;
-            }
-            div[style*="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem"] {
-                grid-template-columns: 1fr !important;
-            }
-            div[style*="display:grid;grid-template-columns:1fr 1fr;gap:1rem"] {
-                grid-template-columns: 1fr !important;
-            }
-            .info-bar { flex-direction: column; align-items: stretch; text-align: center; }
-            .info-bar > div:last-child { justify-content: center; margin-top: 10px; }
-            .question-header { flex-direction: column; align-items: flex-start; gap: 8px; }
-        }
-
-        /* Mobile nhỏ */
         @media (max-width: 600px) {
-            header h1 { font-size: 1.1rem; }
+            header h1 { font-size: 1rem; }
             .container { padding: 0.5rem; }
             .screen { padding: 1rem; border-radius: 12px; }
-            .instruction-content { padding: 1.5rem; }
-            .instruction-content h2 { font-size: 1.4rem; }
-            .instruction-content li { 
-                font-size: 0.9rem; 
-                white-space: normal; /* Cho phép rớt dòng trên điện thoại */
-                align-items: flex-start;
-            }
-            .instruction-content li::before { margin-top: 2px; }
-            .btn { width: 100%; padding: 0.9rem; justify-content: center; }
-            .nav-buttons { flex-direction: column; gap: 10px !important; }
-            #final-score { font-size: 3.5rem !important; }
-            .tf-buttons { flex-direction: column; }
-            .option-item { font-size: 0.95rem; padding: 0.8rem; }
-            .question-text { font-size: 1.05rem; }
+            .instruction-content h2 { font-size: 1.5rem; }
+            .instruction-content li { font-size: 0.85rem; }
+            .btn { width: 100%; padding: 0.9rem; }
+            .nav-buttons { flex-direction: column; gap: 8px !important; }
+            #final-score { font-size: 4rem !important; }
         }
     </style>
 </head>
@@ -154,6 +124,7 @@
 <header><h1>NĂNG LƯỢNG VÀ CÔNG - KHTN 9</h1></header>
 <div id="toast"></div>
 
+<!-- Màn hình hướng dẫn Luyện tập -->
 <div id="instruction-overlay">
     <div class="instruction-content">
         <h2>THỂ LỆ LUYỆN TẬP</h2>
@@ -169,6 +140,7 @@
 </div>
 
 <div class="container">
+    <!-- Màn hình Đăng nhập -->
     <div id="screen-login" class="screen active">
         <h2 style="text-align:center; margin-bottom:1.5rem; color:var(--primary-color); font-weight: 800;">THÔNG TIN NGƯỜI HỌC</h2>
         <div style="margin-bottom:1rem"><label style="display:block;margin-bottom:0.3rem;font-weight:600;font-size:0.9rem">Số báo danh:</label><input type="text" id="input-sbd" style="width:100%;padding:0.8rem;border:2px solid #cbd5e1;border-radius:8px" placeholder="Ví dụ: 011"></div>
@@ -183,6 +155,7 @@
         </div>
     </div>
 
+    <!-- Màn hình Trò chơi -->
     <div id="screen-game" class="screen">
         <div class="info-bar">
             <div id="user-display"></div>
@@ -204,6 +177,7 @@
         </div>
     </div>
 
+    <!-- Màn hình Kết quả -->
     <div id="screen-result" class="screen">
         <div style="text-align:center">
             <h2 id="result-header" style="color:var(--primary-color); font-size: 1.5rem; margin-bottom: 0.8rem;"></h2>
@@ -236,7 +210,7 @@
         { id: "Q9", question: "Khi vật lên cao, thế năng trọng trường của nó thay đổi như thế nào?", options: ["Tăng lên.", "Giảm đi.", "Không đổi.", "Bằng không."], correctAnswer: "Tăng lên.", hint: "Thế năng trọng trường tỉ lệ thuận với độ cao h.", explanation: "Vì \\(W_t = Ph\\), h tăng thì \\(W_t\\) tăng." },
         { id: "Q10", question: "Cơ năng được bảo toàn khi nào?", options: ["Bỏ qua ma sát và sức cản.", "Có lực ma sát tác dụng.", "Vật đứng yên.", "Vật đang nóng lên."], correctAnswer: "Bỏ qua ma sát và sức cản.", hint: "Khi không có sự hao phí năng lượng chuyển thành nhiệt năng.", explanation: "Nếu chỉ chịu tác dụng của lực phát động, cơ năng được bảo toàn." },
         { id: "Q11", question: "Một người xách túi thực phẩm đi bộ trên đường nằm ngang, lực kéo của tay có sinh công không?", options: ["Không sinh công.", "Có sinh công dương.", "Có sinh công âm.", "Phụ thuộc vận tốc."], correctAnswer: "Không sinh công.", hint: "Lực nâng có phương thẳng đứng, vuông góc với phương dịch chuyển nằm ngang.", explanation: "Lực vuông góc với phương dịch chuyển thì không sinh công." },
-        { id: "Q12", question: "Công suất 1 kW tương ứng với bao nhiêu Watt?", options: ["1000 W.", "100 W.", "10 W.", "10000 W."], correctAnswer: "1000 W.", hint: "Kilo (k) là tiền tố có giá trị bằng một nghìn.", explanation: "1 kW = 1000 W." }
+        { id: "Q12", question: "Công suất 1 kW tương ứng với bao nhiêu Watt?", options: ["1000 W.", "100 W.", "100 W.", "10000 W."], correctAnswer: "1000 W.", hint: "Kilo (k) là tiền tố có giá trị bằng một nghìn.", explanation: "1 kW = 1000 W." }
     ];
 
     const rawTF = [
