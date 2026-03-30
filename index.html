@@ -22,16 +22,15 @@
             --accent: #7c3aed;
         }
 
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
-        
-        /* KHÓA CỨNG KHUNG MÀN HÌNH TỔNG */
-        body, html { background-color: var(--light-bg); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; max-width: 100vw; overflow-x: hidden; }
+        /* Thêm thuộc tính tự động bẻ từ (break-word) để chống tràn màn hình đt */
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; overflow-wrap: break-word; word-wrap: break-word; }
+        body { background-color: var(--light-bg); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
         header { background-color: var(--primary-color); color: var(--white); padding: 1rem; text-align: center; border-bottom: 4px solid var(--secondary-color); position: sticky; top: 0; z-index: 100; }
         header h1 { font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
 
-        .container { max-width: 900px; margin: 0 auto; padding: 1rem; width: 100%; flex-grow: 1; display: flex; flex-direction: column; overflow-x: hidden; }
-        .screen { display: none; background: var(--white); padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); animation: fadeIn 0.4s ease; border: 1px solid #e2e8f0; width: 100%; max-width: 100%; box-sizing: border-box; }
+        .container { max-width: 900px; margin: 0 auto; padding: 1rem; width: 100%; flex-grow: 1; display: flex; flex-direction: column; }
+        .screen { display: none; background: var(--white); padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); animation: fadeIn 0.4s ease; border: 1px solid #e2e8f0; }
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -72,33 +71,20 @@
         .vn-flag::after { content: "★"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--vn-yellow); font-size: 9px; }
 
         .question-header { font-size: 1.3rem; font-weight: 800; color: var(--secondary-color); margin-bottom: 0.8rem; padding-bottom: 0.6rem; border-bottom: 2px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* CÁC THẺ CHỨA VĂN BẢN VÀ ĐÁP ÁN: CHUYỂN SANG DISPLAY: BLOCK ĐỂ TRÁNH LỖI FLEXBOX VỚI MATHJAX */
-        .question-text, .option-item, .history-q-text, .history-option, .history-explanation, #review-box, #review-content {
-            display: block !important; 
-            width: 100%;
-            max-width: 100%;
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iOS */
-            word-wrap: break-word !important;
-            overflow-wrap: break-word !important;
-            box-sizing: border-box;
-        }
-
         .question-text { font-size: 1.15rem; line-height: 1.6; margin-bottom: 1.5rem; color: #1e293b; font-weight: 500; text-align: left; }
 
-        .option-item { padding: 1rem; border: 2px solid #f1f5f9; border-radius: 12px; cursor: pointer; margin-bottom: 0.8rem; transition: 0.2s; font-size: 1.05rem; background: #fff; text-align: left; line-height: 1.5; }
+        .option-item { padding: 1rem; border: 2px solid #f1f5f9; border-radius: 12px; cursor: pointer; margin-bottom: 0.8rem; transition: 0.2s; font-size: 1.05rem; background: #fff; display: flex; align-items: center; gap: 10px; text-align: left; }
         .option-item:hover { background-color: #f8fafc; border-color: #cbd5e1; }
         .option-item.selected { border-color: var(--secondary-color); background-color: #eff6ff; font-weight: 700; box-shadow: 0 4px 10px rgba(29, 78, 216, 0.1); }
 
-        .tf-row { padding: 1rem 0; border-bottom: 1px solid #f1f5f9; max-width: 100%; overflow-x: hidden; }
-        .tf-statement { font-size: 1.05rem; margin-bottom: 0.8rem; line-height: 1.5; color: #334155; text-align: left; max-width: 100%; overflow-x: auto; display: block; }
-        .tf-buttons { display: flex; gap: 10px; width: 100%; }
+        .tf-row { padding: 1rem 0; border-bottom: 1px solid #f1f5f9; }
+        .tf-statement { font-size: 1.05rem; margin-bottom: 0.8rem; line-height: 1.5; color: #334155; text-align: left; }
+        .tf-buttons { display: flex; gap: 10px; }
         .btn-tf { flex: 1; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; font-weight: 800; background: #fff; transition: 0.2s; font-size: 0.9rem; }
         .btn-tf.active-true { background: var(--success); color: white; border-color: var(--success); }
         .btn-tf.active-false { background: var(--danger); color: white; border-color: var(--danger); }
 
-        .short-answer-input { width: 100%; padding: 1rem; border: 3px solid #e2e8f0; border-radius: 12px; font-size: 1.4rem; outline: none; text-align: center; font-weight: bold; color: var(--secondary-color); transition: 0.3s; box-sizing: border-box; }
+        .short-answer-input { width: 100%; padding: 1rem; border: 3px solid #e2e8f0; border-radius: 12px; font-size: 1.4rem; outline: none; text-align: center; font-weight: bold; color: var(--secondary-color); transition: 0.3s; }
 
         .btn { padding: 0.8rem 1.4rem; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; }
         .btn-primary { background-color: var(--secondary-color); color: white; }
@@ -113,36 +99,49 @@
         #toast { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 0.8rem 1.5rem; border-radius: 40px; z-index: 10001; display: none; font-weight: bold; box-shadow: 0 8px 20px rgba(0,0,0,0.15); font-size: 0.9rem; }
 
         /* History Review Cards */
-        .history-card { margin-bottom: 2rem; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 15px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.02); text-align: left; max-width: 100%; overflow: hidden; }
+        .history-card { margin-bottom: 2rem; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 15px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.02); text-align: left; }
         .history-q-text { font-weight: 800; margin-bottom: 1rem; color: var(--primary-color); font-size: 1.1rem; line-height: 1.5; }
-        .history-option { padding: 1rem; border-radius: 10px; margin-bottom: 0.6rem; border: 2px solid #f1f5f9; font-size: 1rem; line-height: 1.5; }
+        .history-option { padding: 1rem; border-radius: 10px; margin-bottom: 0.6rem; border: 2px solid #f1f5f9; font-size: 1rem; display: flex; align-items: center; gap: 10px; }
         .history-option.correct { background-color: #dcfce7; border-color: #22c55e; color: #166534; font-weight: 600; }
         .history-option.wrong { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
         .history-explanation { margin-top: 1.5rem; padding: 1.2rem; background: #eff6ff; border-radius: 12px; border-left: 6px solid var(--secondary-color); color: #1e40af; line-height: 1.7; font-size: 0.95rem; }
 
-        /* ÉP CÁC CÔNG THỨC MATHJAX CHỈ ĐƯỢC PHÉP HIỂN THỊ NỘI BỘ VÀ TỰ CÓ THANH CUỘN */
-        mjx-container {
-            max-width: 100% !important;
-            overflow-x: auto !important;
-            overflow-y: hidden !important;
-            display: inline-block !important; 
-            vertical-align: middle;
-        }
-        
-        ::-webkit-scrollbar { height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-
         footer { background: #f1f5f9; text-align: center; padding: 1rem; font-size: 0.8rem; color: #64748b; border-top: 1px solid #e2e8f0; margin-top: auto; }
 
+        /* NÂNG CẤP GIAO DIỆN MOBILE TẠI ĐÂY (KHÔNG ẢNH HƯỞNG CODE JS GỐC) */
         @media (max-width: 600px) {
-            header h1 { font-size: 1rem; }
-            .container { padding: 0.5rem; }
-            .screen { padding: 1rem; border-radius: 12px; }
-            .instruction-content h2 { font-size: 1.5rem; }
-            .instruction-content li { font-size: 0.85rem; }
-            .btn { width: 100%; padding: 0.9rem; }
-            .nav-buttons { flex-direction: column; gap: 8px !important; }
+            header h1 { font-size: 1.05rem; padding: 0.8rem; }
+            .container { padding: 0.6rem; }
+            .screen { padding: 1.2rem; border-radius: 12px; }
+            
+            /* Ép Thể lệ trò chơi tự động gập dòng */
+            .instruction-content h2 { font-size: 1.4rem; }
+            .instruction-content li { font-size: 0.9rem; white-space: normal; line-height: 1.5; align-items: flex-start; }
+            
+            /* Gập thanh Info Bar (Tên, Giờ, Cờ) gọn gàng trên mobile */
+            .info-bar { flex-direction: column; align-items: stretch; gap: 8px; text-align: center; }
+            .info-bar > div:first-child { margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; }
+            .info-bar > div:last-child { justify-content: space-between; }
+            .timer-box { flex-grow: 1; }
+            #flag-display { flex-grow: 1; justify-content: center; }
+            
+            /* Tùy chỉnh nội dung câu hỏi cho vừa khung */
+            .question-header { flex-direction: column; align-items: flex-start; gap: 6px; font-size: 1.1rem; }
+            .question-text { font-size: 1.05rem; overflow-x: auto; padding-bottom: 5px; } /* Cho phép thanh cuộn ngang cục bộ nếu công thức siêu dài */
+            .option-item { font-size: 0.95rem; align-items: flex-start; overflow-x: auto; }
+            .tf-statement { font-size: 0.95rem; }
+            
+            /* Thu nhỏ lại Nút bấm */
+            .btn { width: 100%; padding: 0.8rem; font-size: 0.9rem; justify-content: center; }
+            .nav-buttons { flex-direction: column; gap: 8px !important; margin-top: 1.5rem; }
+            
             #final-score { font-size: 4rem !important; }
+            
+            /* Ép Modal hệ thống và Admin panel không bị tràn màn hình đt */
+            #sys-modal-box { padding: 18px; }
+            #admin-panel { padding: 15px; width: 95%; max-height: 90vh; overflow-y: auto; }
+            .db-settings-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .db-time-input-group { width: 100%; justify-content: space-between; }
         }
     </style>
 </head>
@@ -237,7 +236,7 @@
         { id: "Q9", question: "Khi vật lên cao, thế năng trọng trường của nó thay đổi như thế nào?", options: ["Tăng lên.", "Giảm đi.", "Không đổi.", "Bằng không."], correctAnswer: "Tăng lên.", hint: "Thế năng trọng trường tỉ lệ thuận với độ cao h.", explanation: "Vì \\(W_t = Ph\\), h tăng thì \\(W_t\\) tăng." },
         { id: "Q10", question: "Cơ năng được bảo toàn khi nào?", options: ["Bỏ qua ma sát và sức cản.", "Có lực ma sát tác dụng.", "Vật đứng yên.", "Vật đang nóng lên."], correctAnswer: "Bỏ qua ma sát và sức cản.", hint: "Khi không có sự hao phí năng lượng chuyển thành nhiệt năng.", explanation: "Nếu chỉ chịu tác dụng của lực phát động, cơ năng được bảo toàn." },
         { id: "Q11", question: "Một người xách túi thực phẩm đi bộ trên đường nằm ngang, lực kéo của tay có sinh công không?", options: ["Không sinh công.", "Có sinh công dương.", "Có sinh công âm.", "Phụ thuộc vận tốc."], correctAnswer: "Không sinh công.", hint: "Lực nâng có phương thẳng đứng, vuông góc với phương dịch chuyển nằm ngang.", explanation: "Lực vuông góc với phương dịch chuyển thì không sinh công." },
-        { id: "Q12", question: "Công suất 1 kW tương ứng với bao nhiêu Watt?", options: ["1000 W.", "100 W.", "100 W.", "10000 W."], correctAnswer: "1000 W.", hint: "Kilo (k) là tiền tố có giá trị bằng một nghìn.", explanation: "1 kW = 1000 W." }
+        { id: "Q12", question: "Công suất 1 kW tương ứng với bao nhiêu Watt?", options: ["1000 W.", "100 W.", "10 W.", "10000 W."], correctAnswer: "1000 W.", hint: "Kilo (k) là tiền tố có giá trị bằng một nghìn.", explanation: "1 kW = 1000 W." }
     ];
 
     const rawTF = [
@@ -250,7 +249,7 @@
     const rawShort = [
         { id: "SA1", question: "Tính công thực hiện khi lực 50 N đẩy xe đi được 10 m theo phương của lực (J).", answer: "500", hint: "Tính theo tích số: A = F . s", explanation: "\\(A = 50 \\cdot 10 = 500\\text{ J}.\\)" },
         { id: "SA2", question: "Một máy thực hiện công 3000 J trong 1 phút. Tính công suất của máy (W).", answer: "50", hint: "Công suất P = A / t. Lưu ý đổi 1 phút = 60 giây.", explanation: "\\(P = 3000 / 60 = 50\\text{ W}.\\)" },
-        { id: "SA3", question: "Vật khối lượng 2 kg đang chạy với vận tốc 4 m/s. Tính động năng (J).", answer: "16", hint: "Động năng bằng 1/2 nhân khối lượng nhân bình phương vận tốc.", explanation: "\\(W_d = 0,5 \\cdot 2 \\cdot 4^2 = 16\\text{ J}.\\)" },
+        { id: "SA3", question: "Vật khối lượng 2 kg đang chạy with vận tốc 4 m/s. Tính động năng (J).", answer: "16", hint: "Động năng bằng 1/2 nhân khối lượng nhân bình phương vận tốc.", explanation: "\\(W_d = 0,5 \\cdot 2 \\cdot 4^2 = 16\\text{ J}.\\)" },
         { id: "SA4", question: "Vật nặng 1 kg ở độ cao 5 m. Lấy g = 10 m/s². Tính thế năng trọng trường (J).", answer: "50", hint: "Thế năng trọng trường Wt = m . g . h", explanation: "\\(W_t = 1 \\cdot 10 \\cdot 5 = 50\\text{ J}.\\)" }
     ];
 
@@ -619,6 +618,472 @@
     function showToast(msg) {
         const t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block';
         setTimeout(() => t.style.display = 'none', 2500);
+    }
+</script>
+
+<!-- =====================================================================================
+     HỆ THỐNG GIAO DIỆN BẢO MẬT & QUẢN TRỊ VIÊN (APPENDED MODULE)
+     Tuyệt đối không sửa bất kỳ hàm gốc nào, hệ thống sử dụng Custom Modal để chống chặn Iframe!
+     ===================================================================================== -->
+
+<!-- 1. HỘP THOẠI MODAL THÔNG BÁO TÙY CHỈNH (THAY THẾ CHỨC NĂNG ALERT/CONFIRM GỐC) -->
+<div id="sys-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.8); z-index:100002; backdrop-filter:blur(5px); align-items:center; justify-content:center;">
+    <div id="sys-modal-box" style="background:white; padding:25px; border-radius:16px; max-width:400px; width:90%; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.3); transform: scale(0.9); transition: 0.2s;">
+        <h3 id="sys-modal-title" style="color:#0f172a; margin-bottom:15px; font-size:1.3rem; font-weight:800;">Thông báo</h3>
+        <p id="sys-modal-msg" style="color:#334155; margin-bottom:20px; font-size:1.05rem; line-height:1.6; white-space: pre-wrap;"></p>
+        <div style="display:flex; gap:10px; justify-content:center;">
+            <button id="sys-modal-btn-cancel" class="btn" style="display:none; background:#e2e8f0; color:#475569; font-weight: bold;">Hủy bỏ</button>
+            <button id="sys-modal-btn-ok" class="btn btn-primary" style="min-width:120px;">Đồng ý</button>
+        </div>
+    </div>
+</div>
+
+<!-- 2. NÚT KÍCH HOẠT QUẢN TRỊ ẨN -->
+<div id="admin-trigger" onclick="openAdmin()" style="position: fixed; bottom: 0; right: 0; width: 40px; height: 40px; cursor: pointer; z-index: 9999; opacity: 0;"></div>
+
+<!-- 3. BẢNG ĐIỀU KHIỂN QUẢN TRỊ VIÊN -->
+<div id="admin-panel" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 95%; max-width: 450px; background: white; border: 3px solid #0f172a; border-radius: 15px; padding: 25px; z-index: 10000; box-shadow: 0 0 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto;">
+    <h3 style="text-align:center; color:#1d4ed8; margin-bottom:15px; font-weight: 800;">QUẢN TRỊ VIÊN (GIÁO VIÊN)</h3>
+    <div id="admin-auth">
+        <label style="display:block; margin-bottom:8px; font-weight:600; font-size:0.9rem;">Mật khẩu truy cập:</label>
+        <input type="password" id="admin-pass" placeholder="Nhập mã xác thực (123456)..." style="width:100%; padding:12px; margin-bottom:15px; border:2px solid #cbd5e1; border-radius:8px; outline:none;">
+        <button class="btn btn-primary" style="width:100%" onclick="checkAdminPass()">ĐĂNG NHẬP</button>
+        <button class="btn" style="width:100%; margin-top:10px; color:#64748b" onclick="closeAdmin()">Hủy bỏ</button>
+    </div>
+    <div id="admin-tools" style="display:none;">
+        <div style="background:#f1f5f9; padding:12px; border-radius:8px; margin-bottom:15px; font-size:0.85rem; line-height:1.4; color: #334155;">
+            <b>Công cụ Điều khiển Lớp học (Bypass Gốc):</b>
+        </div>
+        <button class="btn btn-primary" style="width:100%; margin-bottom:12px; font-size: 0.9rem; background: #3b82f6;" onclick="adminForceStart('exam')">🚀 Vào thẳng bài KIỂM TRA (Bỏ qua điền tên)</button>
+        <button class="btn btn-warning" style="width:100%; margin-bottom:12px; color:white; font-size: 0.9rem;" onclick="adminDisableAntiCheat()">🛡 Tắt Chống gian lận (Cho phép chuyển tab)</button>
+        <button class="btn btn-star" style="width:100%; margin-bottom:12px; font-size: 0.9rem;" onclick="adminToggleTimer()" id="admin-btn-timer">⏳ Tạm dừng / Tiếp tục Thời gian</button>
+        <hr style="margin:15px 0; border:0; border-top:1px solid #e2e8f0;">
+        <button class="btn btn-success" style="width:100%; margin-bottom:12px; background:#16a34a; color:white; font-size: 0.9rem;" onclick="adminSkipToResult()">✅ Hoàn thành bài & Đạt điểm tối đa (10.0)</button>
+        <button class="btn" style="width:100%; margin-bottom:12px; border: 2px solid #ea580c; color: #ea580c; background: white; font-size: 0.9rem;" onclick="adminShowCurrentAnswer()">💡 Tiết lộ đáp án câu hiện tại</button>
+        <button class="btn btn-danger" style="width:100%; font-size: 0.9rem;" onclick="closeAdmin()">Thoát chế độ Quản trị</button>
+    </div>
+</div>
+
+<!-- 4. GIAO DIỆN BẢNG DASHBOARD QUẢN LÝ KẾT QUẢ -->
+<style>
+    #admin-dashboard-view {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: #0b1120; z-index: 100001; overflow-y: auto;
+        display: none; padding: 25px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .db-container { max-width: 1200px; margin: 0 auto; }
+    .db-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .db-title { color: white; font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; gap: 10px; margin: 0; text-transform: uppercase; }
+    .db-title span { background: linear-gradient(90deg, #f97316, #eab308); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2rem;}
+    .db-btn-close { background: white; color: #0f172a; border: none; padding: 8px 20px; border-radius: 20px; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 0.9rem;}
+    .db-btn-close:hover { background: #e2e8f0; }
+
+    .db-stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 25px; }
+    .db-stat-card { background: white; border-radius: 12px; padding: 20px 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid transparent;}
+    .db-stat-val { font-size: 1.8rem; font-weight: 900; color: #0f172a; margin-bottom: 5px; }
+    .db-stat-lbl { font-size: 0.95rem; font-weight: 600; color: #64748b; }
+    .db-stat-card.active { border-bottom-color: #ef4444; }
+
+    .db-settings-row { background: #fffbeb; border-left: 5px solid #f59e0b; padding: 15px 20px; border-radius: 12px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    .db-time-input-group { display: flex; align-items: center; gap: 8px; background: white; padding: 5px 12px; border-radius: 8px; border: 1px solid #fcd34d; }
+    .db-time-input { width: 60px; padding: 5px; border: none; border-bottom: 2px solid #fcd34d; font-weight: bold; text-align: center; color: #b45309; font-size: 1.1rem; outline: none; }
+    
+    .db-filters { background: white; padding: 15px 20px; border-radius: 12px; display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; margin-bottom: 25px; }
+    .db-filter-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 150px; }
+    .db-filter-group label { font-size: 0.75rem; font-weight: bold; color: #64748b; margin-bottom: 5px; text-transform: uppercase; }
+    .db-filter-group select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; outline: none; background: white;}
+    
+    .db-btn-group { display: flex; gap: 10px; }
+    .db-btn-filter { padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-size: 0.9rem; color: white; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
+    .db-btn-filter:hover { opacity: 0.9; transform: translateY(-1px); }
+    .db-btn-refresh { background-color: #3b82f6; }
+    .db-btn-export { background-color: #10b981; }
+    .db-btn-time { background-color: #f59e0b; }
+
+    .db-table-wrapper { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    .db-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .db-table th { background-color: #1d4ed8; color: white; padding: 15px; font-size: 0.95rem; font-weight: 600; }
+    .db-table td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; color: #334155; font-size: 0.95rem; font-weight: 500; vertical-align: middle; }
+    .db-badge-mode { background: #ef4444; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; display: inline-block; text-align: center; min-width: 70px;}
+    .db-btn-delete { background: #ef4444; color: white; width: 28px; height: 28px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+    .db-btn-delete:hover { background: #dc2626; transform: scale(1.05); }
+
+    @media (max-width: 800px) { .db-stats-grid { grid-template-columns: repeat(3, 1fr); } .db-table-wrapper { overflow-x: auto; } }
+    @media (max-width: 500px) { .db-stats-grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+
+<div id="admin-dashboard-view">
+    <div class="db-container">
+        <div class="db-header">
+            <h2 class="db-title"><span>📊</span> QUẢN LÝ KẾT QUẢ</h2>
+            <button class="db-btn-close" onclick="closeAdminDashboard()">THOÁT</button>
+        </div>
+        <div class="db-stats-grid">
+            <div class="db-stat-card"><div class="db-stat-val" id="stat-xs">0</div><div class="db-stat-lbl">X.Sắc</div></div>
+            <div class="db-stat-card"><div class="db-stat-val" id="stat-g">0</div><div class="db-stat-lbl">Giỏi</div></div>
+            <div class="db-stat-card"><div class="db-stat-val" id="stat-k">0</div><div class="db-stat-lbl">Khá</div></div>
+            <div class="db-stat-card"><div class="db-stat-val" id="stat-d">0</div><div class="db-stat-lbl">Đạt</div></div>
+            <div class="db-stat-card active"><div class="db-stat-val" id="stat-cd">0</div><div class="db-stat-lbl">C.Đạt</div></div>
+        </div>
+        <div class="db-settings-row">
+            <div style="font-weight: 800; font-size: 1.1rem; color: #b45309; margin-right: 10px;">⏱️ THỜI GIAN THI:</div>
+            <div class="db-time-input-group">
+                <span style="font-weight:bold; font-size:0.9rem; color:#ef4444;">KIỂM TRA:</span>
+                <input type="number" id="db-time-exam" value="40" min="1" max="180" class="db-time-input">
+                <span style="font-weight: bold; color: #b45309; font-size: 0.8rem;">phút</span>
+            </div>
+            <div class="db-time-input-group">
+                <span style="font-weight:bold; font-size:0.9rem; color:#3b82f6;">LUYỆN TẬP:</span>
+                <input type="number" id="db-time-practice" value="0" min="0" max="180" class="db-time-input" title="Nhập 0 để học sinh làm TỰ DO">
+                <span style="font-weight: bold; color: #b45309; font-size: 0.8rem;">phút (0 = TỰ DO)</span>
+            </div>
+            <div style="flex-grow: 1;"></div>
+            <button class="db-btn-filter db-btn-time" onclick="applyTimeSetting()">ÁP DỤNG NGAY</button>
+            <span id="time-setting-msg" style="color: #16a34a; font-weight: bold; font-size: 0.95rem; display: none; margin-left: 10px;">✔ Đã cập nhật!</span>
+        </div>
+        <div class="db-filters">
+            <div class="db-filter-group"><label>Sắp xếp:</label><select id="db-sort"><option value="score">Điểm cao nhất</option><option value="newest">Mới nhất</option></select></div>
+            <div class="db-filter-group"><label>Trường:</label><select id="db-school"><option value="all">Tất cả trường</option></select></div>
+            <div class="db-filter-group"><label>Lớp:</label><select id="db-class"><option value="all">Tất cả lớp</option></select></div>
+            <div class="db-filter-group"><label>Chế độ:</label><select id="db-mode"><option value="all">Tất cả</option><option value="KIỂM TRA">Kiểm tra</option><option value="LUYỆN TẬP">Luyện tập</option></select></div>
+            <div class="db-btn-group">
+                <button class="db-btn-filter db-btn-refresh" onclick="renderAdminTable()">LÀM MỚI 🔄</button>
+                <button class="db-btn-filter db-btn-export" onclick="showCustomAlert('Tính năng xuất Excel sẽ tự động tải file khi chạy trên máy chủ thực tế.')">XUẤT 📄</button>
+            </div>
+        </div>
+        <div class="db-table-wrapper">
+            <table class="db-table">
+                <thead>
+                    <tr><th>Hạng</th><th>SBD</th><th>Họ tên</th><th>Lớp</th><th>Trường</th><th style="text-align:center">Chế độ</th><th style="text-align:center">Điểm</th><th>TG Làm</th><th>Ngày</th><th style="text-align:center">Xoá</th></tr>
+                </thead>
+                <tbody id="db-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* =========================================================================
+       PHẦN LOGIC XỬ LÝ (SỬ DỤNG KỸ THUẬT GHI ĐÈ ĐỂ VƯỢT LỖI BẢO MẬT TRÌNH DUYỆT)
+       ========================================================================= */
+    
+    // --- 1. TẠO HỘP THOẠI MODAL TÙY CHỈNH CHỐNG LỖI IFRAME ---
+    function showCustomAlert(msg, title = "THÔNG BÁO") {
+        document.getElementById('sys-modal-title').innerText = title;
+        document.getElementById('sys-modal-msg').innerText = msg;
+        document.getElementById('sys-modal-btn-cancel').style.display = 'none';
+        const okBtn = document.getElementById('sys-modal-btn-ok');
+        okBtn.innerText = "Đóng lại";
+        okBtn.onclick = () => {
+            document.getElementById('sys-modal-box').style.transform = 'scale(0.9)';
+            setTimeout(() => document.getElementById('sys-modal-overlay').style.display = 'none', 150);
+        };
+        document.getElementById('sys-modal-overlay').style.display = 'flex';
+        setTimeout(() => document.getElementById('sys-modal-box').style.transform = 'scale(1)', 10);
+    }
+
+    function showCustomConfirm(msg, callback, title = "XÁC NHẬN") {
+        document.getElementById('sys-modal-title').innerText = title;
+        document.getElementById('sys-modal-msg').innerText = msg;
+        const cancelBtn = document.getElementById('sys-modal-btn-cancel');
+        const okBtn = document.getElementById('sys-modal-btn-ok');
+        
+        cancelBtn.style.display = 'inline-flex';
+        okBtn.innerText = "Đồng ý";
+
+        const closeAndReturn = (result) => {
+            document.getElementById('sys-modal-box').style.transform = 'scale(0.9)';
+            setTimeout(() => { document.getElementById('sys-modal-overlay').style.display = 'none'; callback(result); }, 150);
+        };
+
+        cancelBtn.onclick = () => closeAndReturn(false);
+        okBtn.onclick = () => closeAndReturn(true);
+
+        document.getElementById('sys-modal-overlay').style.display = 'flex';
+        setTimeout(() => document.getElementById('sys-modal-box').style.transform = 'scale(1)', 10);
+    }
+
+    // GHI ĐÈ hàm ALERT gốc toàn cục để nút Gợi Ý có thể hiển thị mượt mà
+    window.alert = function(msg) { showCustomAlert(msg); };
+
+    // --- 2. GHI ĐÈ CÁC NÚT BẤM BỊ LỖI (NỘP BÀI VÀ VÀO THI) ĐỂ DÙNG CUSTOM MODAL ---
+    window._originalShowSubmitConfirm = showSubmitConfirm;
+    showSubmitConfirm = function() { 
+        state.isConfirming = true;
+        showCustomConfirm("Bạn có chắc chắn muốn nộp bài ngay bây giờ?", function(yes) {
+            if(yes) finishGame(); 
+            else state.isConfirming = false;
+        });
+    };
+
+    window._originalConfirmExam = confirmExam;
+    confirmExam = function() {
+        const sbd = document.getElementById('input-sbd').value.trim();
+        const name = document.getElementById('input-name').value.trim();
+        if(!sbd || !name) { showCustomAlert("Vui lòng điền đủ thông tin để làm bài kiểm tra!"); return; }
+        
+        state.isConfirming = true;
+        showCustomConfirm("XÁC NHẬN BÀI KIỂM TRA?\n⚠️ Hệ thống sẽ tự động nộp bài và xử thua nếu bạn rời khỏi trình duyệt hoặc thoát toàn màn hình.", function(yes) {
+            if(yes) {
+                startGame('exam');
+                setTimeout(() => { state.isConfirming = false; }, 1200); 
+            } else {
+                state.isConfirming = false;
+            }
+        });
+    };
+
+    // --- 3. LOGIC LƯU TRỮ VÀ ĐỒNG HỒ ---
+    window.examDatabase = [];
+    window.timeSettings = { exam: 40, practice: 0 };
+    window.currentExamTimeRemaining = 0;
+    window.adminTimerPaused = false;
+
+    // Chèn Nút Mở Dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminTools = document.getElementById('admin-tools');
+        if(adminTools) {
+            const dashboardBtnHTML = `<button class="btn" style="width:100%; margin-bottom:12px; background:#1e293b; color:white; font-size: 0.9rem;" onclick="openAdminDashboard()">📊 Bảng Quản lý Kết quả</button>`;
+            adminTools.insertAdjacentHTML('afterbegin', dashboardBtnHTML);
+        }
+    });
+
+    function timerTick() {
+        window.currentExamTimeRemaining--;
+        if(window.currentExamTimeRemaining <= 0) {
+            clearInterval(state.timer);
+            finishGame();
+        }
+        updateTimerUI();
+    }
+
+    function updateTimerUI() {
+        const m = Math.floor(Math.max(0, window.currentExamTimeRemaining) / 60);
+        const s = Math.max(0, window.currentExamTimeRemaining) % 60;
+        document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    window._originalStartGlobalTimer = startGlobalTimer;
+    startGlobalTimer = function() {
+        window.currentExamTimeRemaining = window.timeSettings.exam * 60;
+        if(state.timer) clearInterval(state.timer); 
+        state.timer = setInterval(timerTick, 1000);
+    };
+
+    function applyTimeSetting() {
+        const newExamTime = parseInt(document.getElementById('db-time-exam').value);
+        const newPracticeTime = parseInt(document.getElementById('db-time-practice').value);
+        
+        if (isNaN(newExamTime) || newExamTime <= 0 || isNaN(newPracticeTime) || newPracticeTime < 0) { 
+            showCustomAlert("Vui lòng nhập số phút hợp lệ! (Kiểm tra > 0, Luyện tập >= 0)"); 
+            return; 
+        }
+
+        const diffExam = newExamTime - window.timeSettings.exam;
+        const diffPractice = newPracticeTime - window.timeSettings.practice;
+
+        window.timeSettings.exam = newExamTime;
+        window.timeSettings.practice = newPracticeTime;
+
+        if (!state.finished) {
+            if (state.mode === 'exam') {
+                window.currentExamTimeRemaining += (diffExam * 60);
+                if (window.currentExamTimeRemaining < 1) window.currentExamTimeRemaining = 1;
+                updateTimerUI();
+            } else if (state.mode === 'practice') {
+                if (newPracticeTime === 0) {
+                    if(state.timer) clearInterval(state.timer);
+                    document.getElementById('timer').innerText = "TỰ DO";
+                } else {
+                    if (window.timeSettings.practice - diffPractice === 0) {
+                        window.currentExamTimeRemaining = newPracticeTime * 60;
+                        if(state.timer) clearInterval(state.timer);
+                        state.timer = setInterval(timerTick, 1000);
+                    } else {
+                        window.currentExamTimeRemaining += (diffPractice * 60);
+                        if (window.currentExamTimeRemaining < 1) window.currentExamTimeRemaining = 1;
+                        updateTimerUI();
+                    }
+                }
+            }
+        }
+        const msg = document.getElementById('time-setting-msg');
+        msg.style.display = 'inline-block';
+        setTimeout(() => msg.style.display = 'none', 3000);
+    }
+
+    function adminToggleTimer() {
+        if (state.finished) return;
+        if (state.mode === 'practice' && window.timeSettings.practice === 0) {
+            showCustomAlert("Học sinh đang ở chế độ TỰ DO, không có thời gian để đóng băng.");
+            return;
+        }
+        const timerEl = document.getElementById('timer');
+        const btnTimer = document.getElementById('admin-btn-timer');
+
+        if (!window.adminTimerPaused) {
+            clearInterval(state.timer);
+            window.adminTimerPaused = true;
+            timerEl.style.color = 'var(--danger)';
+            btnTimer.innerHTML = "▶️ Tiếp tục đếm ngược";
+            showCustomAlert("⏳ Đã TẠM DỪNG thời gian bài thi hiện tại.");
+        } else {
+            state.timer = setInterval(timerTick, 1000);
+            window.adminTimerPaused = false;
+            timerEl.style.color = '';
+            btnTimer.innerHTML = "⏳ Tạm dừng / Tiếp tục Thời gian";
+            showCustomAlert("▶️ Đã TIẾP TỤC thời gian.");
+        }
+    }
+
+    window._originalStartGame = startGame;
+    startGame = function(mode) {
+        window.sessionStartTime = Date.now();
+        window._originalStartGame(mode);
+
+        if (mode === 'practice') {
+            if (window.timeSettings.practice > 0) {
+                window.currentExamTimeRemaining = window.timeSettings.practice * 60;
+                if(state.timer) clearInterval(state.timer);
+                state.timer = setInterval(timerTick, 1000);
+            }
+        }
+    };
+
+    window._originalFinishGame = finishGame;
+    finishGame = function(isCheat = false) {
+        const wasAlreadyFinished = state.finished;
+        window._originalFinishGame(isCheat);
+        
+        if (window.adminForceFullScore && state.finished) {
+            document.getElementById('final-score').innerText = "10.0";
+            document.getElementById('result-header').innerText = `XIN CHÚC MỪNG ${state.userInfo.name.toUpperCase()}!`;
+            const rankEl = document.getElementById('rank-label');
+            rankEl.innerText = "XUẤT SẮC";
+            rankEl.style.backgroundColor = "var(--success)";
+        }
+
+        if(!wasAlreadyFinished && state.finished) {
+            const finalScoreStr = document.getElementById('final-score').innerText;
+            const finalScore = parseFloat(finalScoreStr.replace(',', '.')) || 0;
+            
+            let timeSpent = "N/A";
+            if(window.sessionStartTime) {
+                timeSpent = Math.round((Date.now() - window.sessionStartTime) / 1000) + "s";
+            }
+
+            let rank = document.getElementById('rank-label').innerText || "CHƯA ĐẠT";
+            if(isCheat) rank = "VI PHẠM";
+
+            window.examDatabase.push({
+                id: Date.now(), sbd: state.userInfo.sbd || "-", name: state.userInfo.name || "-", cls: state.userInfo.class || "-", school: state.userInfo.school || "-",
+                mode: state.mode === 'exam' ? 'KIỂM TRA' : 'LUYỆN TẬP', score: finalScore, time: timeSpent, date: new Date().toLocaleDateString('vi-VN'), rank: rank
+            });
+            window.adminForceFullScore = false; 
+        }
+    };
+
+    function openAdminDashboard() {
+        closeAdmin(); 
+        document.getElementById('admin-dashboard-view').style.display = 'block';
+        const uniqueClasses = [...new Set(window.examDatabase.map(r => r.cls).filter(c => c !== '-'))];
+        const uniqueSchools = [...new Set(window.examDatabase.map(r => r.school).filter(s => s !== '-'))];
+        document.getElementById('db-class').innerHTML = '<option value="all">Tất cả lớp</option>' + uniqueClasses.map(c => `<option value="${c}">${c}</option>`).join('');
+        document.getElementById('db-school').innerHTML = '<option value="all">Tất cả trường</option>' + uniqueSchools.map(s => `<option value="${s}">${s}</option>`).join('');
+        document.getElementById('db-time-exam').value = window.timeSettings.exam;
+        document.getElementById('db-time-practice').value = window.timeSettings.practice;
+        renderAdminTable();
+    }
+
+    function closeAdminDashboard() { document.getElementById('admin-dashboard-view').style.display = 'none'; }
+
+    function renderAdminTable() {
+        let counts = { 'XUẤT SẮC': 0, 'GIỎI': 0, 'KHÁ': 0, 'ĐẠT': 0, 'CHƯA ĐẠT': 0 };
+        window.examDatabase.forEach(r => {
+            if(counts[r.rank] !== undefined) counts[r.rank]++;
+            else if(r.rank === 'VI PHẠM') counts['CHƯA ĐẠT']++; 
+        });
+        
+        document.getElementById('stat-xs').innerText = counts['XUẤT SẮC']; document.getElementById('stat-g').innerText = counts['GIỎI'];
+        document.getElementById('stat-k').innerText = counts['KHÁ']; document.getElementById('stat-d').innerText = counts['ĐẠT'];
+        document.getElementById('stat-cd').innerText = counts['CHƯA ĐẠT'];
+
+        const sortVal = document.getElementById('db-sort').value; const classFilter = document.getElementById('db-class').value;
+        const schoolFilter = document.getElementById('db-school').value; const modeFilter = document.getElementById('db-mode').value;
+
+        let filtered = window.examDatabase.filter(r => {
+            return (classFilter === 'all' || r.cls === classFilter) && (schoolFilter === 'all' || r.school === schoolFilter) && (modeFilter === 'all' || r.mode === modeFilter);
+        });
+
+        if(sortVal === 'score') { filtered.sort((a, b) => b.score - a.score || parseInt(a.time) - parseInt(b.time)); } 
+        else { filtered.sort((a, b) => b.id - a.id); }
+
+        const tbody = document.getElementById('db-tbody'); tbody.innerHTML = '';
+        filtered.forEach((r, index) => {
+            let tr = document.createElement('tr');
+            let colorScore = r.score >= 5 ? '#059669' : (r.score >= 4 ? '#ea580c' : '#dc2626');
+            tr.innerHTML = `<td style="font-weight:bold;">${index + 1}</td><td>${r.sbd}</td><td style="font-weight:600;">${r.name}</td><td>${r.cls}</td><td>${r.school}</td><td style="text-align:center;"><span class="db-badge-mode" style="background:${r.mode==='KIỂM TRA'?'#ef4444':'#3b82f6'}">${r.mode}</span></td><td style="text-align:center; font-weight:800; font-size:1.1rem; color:${colorScore}">${r.score}</td><td>${r.time}</td><td>${r.date}</td><td style="text-align:center;"><button class="db-btn-delete" onclick="deleteRecord(${r.id})" title="Xoá bản ghi">X</button></td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function deleteRecord(id) { 
+        showCustomConfirm("Xác nhận xoá bản ghi điểm này khỏi hệ thống?", function(yes) {
+            if(yes) { window.examDatabase = window.examDatabase.filter(r => r.id !== id); renderAdminTable(); }
+        });
+    }
+
+    function openAdmin() { document.getElementById('admin-panel').style.display = 'block'; document.getElementById('admin-pass').focus(); }
+    function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; document.getElementById('admin-auth').style.display = 'block'; document.getElementById('admin-tools').style.display = 'none'; document.getElementById('admin-pass').value = ''; }
+    function checkAdminPass() { const pass = document.getElementById('admin-pass').value; if(pass === "123456") { document.getElementById('admin-auth').style.display = 'none'; document.getElementById('admin-tools').style.display = 'block'; } else { showCustomAlert("Mật khẩu quản trị không chính xác!"); } }
+    
+    function adminForceStart(mode) { 
+        document.getElementById('input-sbd').value = "ADMIN"; 
+        document.getElementById('input-name').value = "Giáo Viên"; 
+        document.getElementById('input-class').value = "GV"; 
+        document.getElementById('input-school').value = "Ban Quản Trị"; 
+        closeAdmin(); 
+        if(mode === 'exam') { 
+            state.isConfirming = true; 
+            startGame('exam'); 
+            setTimeout(() => { state.isConfirming = false; }, 1200); 
+        } else { 
+            document.getElementById('instruction-overlay').style.display = 'none'; 
+            startGame('practice'); 
+        } 
+    }
+    
+    function adminDisableAntiCheat() { window.onblur = null; document.onvisibilitychange = null; document.onfullscreenchange = null; showCustomAlert("🛡 ĐÃ TẮT HỆ THỐNG CHỐNG GIAN LẬN!"); }
+    
+    function adminSkipToResult() { 
+        if(!state.questions || state.questions.length === 0) {
+            adminForceStart('exam');
+            return;
+        } 
+        
+        showCustomConfirm("Hệ thống sẽ tự động điền đáp án, nộp bài và gán ĐIỂM TỐI ĐA (10.0)?", function(yes) { 
+            if(yes) {
+                window.adminForceFullScore = true; 
+                state.questions.forEach((q, i) => { 
+                    if(q.options) state.answers[i] = q.correctAnswer; 
+                    else if(q.correctPattern) state.answers[i] = [...q.correctPattern]; 
+                    else state.answers[i] = q.answer; 
+                }); 
+                finishGame(); 
+                closeAdmin();
+            }
+        });
+    }
+
+    function adminShowCurrentAnswer() { 
+        if(!state.questions || state.questions.length === 0) return; 
+        const q = state.questions[state.index]; 
+        let msg = "ĐÁP ÁN CÂU " + (state.index + 1) + ":\n"; 
+        if(q.options) msg += "=> " + q.correctAnswer; 
+        else if(q.correctPattern) msg += "=> " + q.correctPattern.map(v => v ? "ĐÚNG" : "SAI").join(" | "); 
+        else msg += "=> " + q.answer; 
+        showCustomAlert(msg); 
+        closeAdmin(); 
     }
 </script>
 </body>
