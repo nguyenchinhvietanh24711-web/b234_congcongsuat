@@ -622,7 +622,7 @@
 </script>
 
 <!-- =====================================================================================
-     HỆ THỐNG GIAO DIỆN BẢO MẬT & QUẢN TRỊ VIÊN (APPENDED MODULE)
+     HỆ THỐNG GIAO DIỆN BẢO MẬT & QUẢN TRỊ VIÊN (APPENDED MODULE CLOUD STORAGE)
      Tuyệt đối không sửa bất kỳ hàm gốc nào, hệ thống sử dụng Custom Modal để chống chặn Iframe!
      ===================================================================================== -->
 
@@ -658,7 +658,7 @@
         <button class="btn btn-warning" style="width:100%; margin-bottom:12px; color:white; font-size: 0.9rem;" onclick="adminDisableAntiCheat()">🛡 Tắt Chống gian lận (Cho phép chuyển tab)</button>
         <button class="btn btn-star" style="width:100%; margin-bottom:12px; font-size: 0.9rem;" onclick="adminToggleTimer()" id="admin-btn-timer">⏳ Tạm dừng / Tiếp tục Thời gian</button>
         <hr style="margin:15px 0; border:0; border-top:1px solid #e2e8f0;">
-        <button class="btn btn-success" style="width:100%; margin-bottom:12px; background:#16a34a; color:white; font-size: 0.9rem;" onclick="adminSkipToResult()">✅ Hoàn thành bài & Đạt điểm tối đa (10.0)</button>
+        <button class="btn btn-success" style="width:100%; margin-bottom:12px; background:#16a34a; color:white; font-size: 0.9rem;" onclick="adminSkipToResult()">✅ Hoàn thành bài & Đạt điểm tối đa (7.0)</button>
         <button class="btn" style="width:100%; margin-bottom:12px; border: 2px solid #ea580c; color: #ea580c; background: white; font-size: 0.9rem;" onclick="adminShowCurrentAnswer()">💡 Tiết lộ đáp án câu hiện tại</button>
         <button class="btn btn-danger" style="width:100%; font-size: 0.9rem;" onclick="closeAdmin()">Thoát chế độ Quản trị</button>
     </div>
@@ -748,7 +748,7 @@
             <div class="db-filter-group"><label>Chế độ:</label><select id="db-mode"><option value="all">Tất cả</option><option value="KIỂM TRA">Kiểm tra</option><option value="LUYỆN TẬP">Luyện tập</option></select></div>
             <div class="db-btn-group">
                 <button class="db-btn-filter db-btn-refresh" onclick="renderAdminTable()">LÀM MỚI 🔄</button>
-                <button class="db-btn-filter db-btn-export" onclick="showCustomAlert('Tính năng xuất Excel sẽ tự động tải file khi chạy trên máy chủ thực tế.')">XUẤT 📄</button>
+                <button class="db-btn-filter db-btn-export" onclick="showCustomAlert('Hệ thống lưu trữ Đám mây tự động cập nhật dữ liệu liên tục.')">XUẤT 📄</button>
             </div>
         </div>
         <div class="db-table-wrapper">
@@ -765,6 +765,7 @@
 <script>
     /* =========================================================================
        PHẦN LOGIC XỬ LÝ (SỬ DỤNG KỸ THUẬT GHI ĐÈ ĐỂ VƯỢT LỖI BẢO MẬT TRÌNH DUYỆT)
+       Đã TÍCH HỢP Hệ thống máy chủ đám mây Cloud Storage để lưu trữ vĩnh viễn!
        ========================================================================= */
     
     // --- 1. TẠO HỘP THOẠI MODAL TÙY CHỈNH CHỐNG LỖI IFRAME ---
@@ -807,7 +808,7 @@
     window.alert = function(msg) { showCustomAlert(msg); };
 
     // --- 2. GHI ĐÈ CÁC NÚT BẤM BỊ LỖI (NỘP BÀI VÀ VÀO THI) ĐỂ DÙNG CUSTOM MODAL ---
-    window._originalShowSubmitConfirm = showSubmitConfirm;
+    window._originalShowSubmitConfirm = window._originalShowSubmitConfirm || showSubmitConfirm;
     showSubmitConfirm = function() { 
         state.isConfirming = true;
         showCustomConfirm("Bạn có chắc chắn muốn nộp bài ngay bây giờ?", function(yes) {
@@ -816,7 +817,7 @@
         });
     };
 
-    window._originalConfirmExam = confirmExam;
+    window._originalConfirmExam = window._originalConfirmExam || confirmExam;
     confirmExam = function() {
         const sbd = document.getElementById('input-sbd').value.trim();
         const name = document.getElementById('input-name').value.trim();
@@ -833,11 +834,50 @@
         });
     };
 
-    // --- 3. LOGIC LƯU TRỮ VÀ ĐỒNG HỒ ---
+    // --- 3. HỆ THỐNG MÁY CHỦ LƯU TRỮ ĐÁM MÂY (CLOUD STORAGE PERSISTENCE) ---
     window.examDatabase = [];
     window.timeSettings = { exam: 40, practice: 0 };
     window.currentExamTimeRemaining = 0;
     window.adminTimerPaused = false;
+    
+    // Khởi tạo Cloud Database Variables
+    window.cloudUser = null;
+    window.cloudDB = null;
+    window.appId = typeof __app_id !== 'undefined' ? __app_id : 'khtn9-app-id';
+
+    (async function initCloudStorage() {
+        try {
+            const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
+            const { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
+            const { getFirestore, collection, onSnapshot, query } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            window.cloudDB = getFirestore(app);
+
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+
+            onAuthStateChanged(auth, (user) => {
+                window.cloudUser = user;
+                if (user) {
+                    const q = query(collection(window.cloudDB, 'artifacts', window.appId, 'public', 'data', 'khtn9_results'));
+                    onSnapshot(q, (snapshot) => {
+                        window.examDatabase = snapshot.docs.map(d => ({ firebaseId: d.id, ...d.data() }));
+                        if (document.getElementById('admin-dashboard-view').style.display === 'block') {
+                            renderAdminTable();
+                        }
+                    }, (error) => console.error("Cloud sync error:", error));
+                }
+            });
+        } catch(e) {
+            console.error("Lỗi khởi tạo máy chủ đám mây:", e);
+        }
+    })();
 
     // Chèn Nút Mở Dashboard
     document.addEventListener('DOMContentLoaded', () => {
@@ -863,7 +903,7 @@
         document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
     }
 
-    window._originalStartGlobalTimer = startGlobalTimer;
+    window._originalStartGlobalTimer = window._originalStartGlobalTimer || startGlobalTimer;
     startGlobalTimer = function() {
         window.currentExamTimeRemaining = window.timeSettings.exam * 60;
         if(state.timer) clearInterval(state.timer); 
@@ -936,7 +976,7 @@
         }
     }
 
-    window._originalStartGame = startGame;
+    window._originalStartGame = window._originalStartGame || startGame;
     startGame = function(mode) {
         window.sessionStartTime = Date.now();
         window._originalStartGame(mode);
@@ -950,13 +990,14 @@
         }
     };
 
-    window._originalFinishGame = finishGame;
+    window._originalFinishGame = window._originalFinishGame || finishGame;
     finishGame = function(isCheat = false) {
         const wasAlreadyFinished = state.finished;
         window._originalFinishGame(isCheat);
         
+        // CẬP NHẬT ĐIỂM TỐI ĐA THÀNH 7.0 CHO PHÙ HỢP CẤU TRÚC ĐỀ
         if (window.adminForceFullScore && state.finished) {
-            document.getElementById('final-score').innerText = "10.0";
+            document.getElementById('final-score').innerText = "7.0";
             document.getElementById('result-header').innerText = `XIN CHÚC MỪNG ${state.userInfo.name.toUpperCase()}!`;
             const rankEl = document.getElementById('rank-label');
             rankEl.innerText = "XUẤT SẮC";
@@ -975,10 +1016,22 @@
             let rank = document.getElementById('rank-label').innerText || "CHƯA ĐẠT";
             if(isCheat) rank = "VI PHẠM";
 
-            window.examDatabase.push({
+            const record = {
                 id: Date.now(), sbd: state.userInfo.sbd || "-", name: state.userInfo.name || "-", cls: state.userInfo.class || "-", school: state.userInfo.school || "-",
                 mode: state.mode === 'exam' ? 'KIỂM TRA' : 'LUYỆN TẬP', score: finalScore, time: timeSpent, date: new Date().toLocaleDateString('vi-VN'), rank: rank
-            });
+            };
+            
+            // XÓA DỮ LIỆU LÊN MÁY CHỦ ĐÁM MÂY (FIREBASE) NẾU ĐÃ KẾT NỐI
+            if (window.cloudUser && window.cloudDB) {
+                import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js").then(({collection, addDoc}) => {
+                    addDoc(collection(window.cloudDB, 'artifacts', window.appId, 'public', 'data', 'khtn9_results'), record);
+                });
+            } else {
+                // Fallback cục bộ nếu rớt mạng
+                window.examDatabase.push(record);
+                if (document.getElementById('admin-dashboard-view').style.display === 'block') renderAdminTable();
+            }
+
             window.adminForceFullScore = false; 
         }
     };
@@ -1022,14 +1075,24 @@
         filtered.forEach((r, index) => {
             let tr = document.createElement('tr');
             let colorScore = r.score >= 5 ? '#059669' : (r.score >= 4 ? '#ea580c' : '#dc2626');
-            tr.innerHTML = `<td style="font-weight:bold;">${index + 1}</td><td>${r.sbd}</td><td style="font-weight:600;">${r.name}</td><td>${r.cls}</td><td>${r.school}</td><td style="text-align:center;"><span class="db-badge-mode" style="background:${r.mode==='KIỂM TRA'?'#ef4444':'#3b82f6'}">${r.mode}</span></td><td style="text-align:center; font-weight:800; font-size:1.1rem; color:${colorScore}">${r.score}</td><td>${r.time}</td><td>${r.date}</td><td style="text-align:center;"><button class="db-btn-delete" onclick="deleteRecord(${r.id})" title="Xoá bản ghi">X</button></td>`;
+            let fbid = r.firebaseId ? `'${r.firebaseId}'` : 'null';
+            tr.innerHTML = `<td style="font-weight:bold;">${index + 1}</td><td>${r.sbd}</td><td style="font-weight:600;">${r.name}</td><td>${r.cls}</td><td>${r.school}</td><td style="text-align:center;"><span class="db-badge-mode" style="background:${r.mode==='KIỂM TRA'?'#ef4444':'#3b82f6'}">${r.mode}</span></td><td style="text-align:center; font-weight:800; font-size:1.1rem; color:${colorScore}">${r.score}</td><td>${r.time}</td><td>${r.date}</td><td style="text-align:center;"><button class="db-btn-delete" onclick="deleteRecord(${r.id}, ${fbid})" title="Xoá bản ghi">X</button></td>`;
             tbody.appendChild(tr);
         });
     }
 
-    function deleteRecord(id) { 
-        showCustomConfirm("Xác nhận xoá bản ghi điểm này khỏi hệ thống?", function(yes) {
-            if(yes) { window.examDatabase = window.examDatabase.filter(r => r.id !== id); renderAdminTable(); }
+    function deleteRecord(id, firebaseId) { 
+        showCustomConfirm("Xác nhận xoá bản ghi điểm này khỏi máy chủ đám mây?", function(yes) {
+            if(yes) { 
+                if (firebaseId && window.cloudUser && window.cloudDB) {
+                    import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js").then(({doc, deleteDoc}) => {
+                        deleteDoc(doc(window.cloudDB, 'artifacts', window.appId, 'public', 'data', 'khtn9_results', firebaseId));
+                    });
+                } else {
+                    window.examDatabase = window.examDatabase.filter(r => r.id !== id); 
+                    renderAdminTable(); 
+                }
+            }
         });
     }
 
@@ -1061,7 +1124,7 @@
             return;
         } 
         
-        showCustomConfirm("Hệ thống sẽ tự động điền đáp án, nộp bài và gán ĐIỂM TỐI ĐA (10.0)?", function(yes) { 
+        showCustomConfirm("Hệ thống sẽ tự động điền đáp án, nộp bài và gán ĐIỂM TỐI ĐA (7.0)?", function(yes) { 
             if(yes) {
                 window.adminForceFullScore = true; 
                 state.questions.forEach((q, i) => { 
