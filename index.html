@@ -851,8 +851,29 @@
             const { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
             const { getFirestore, collection, onSnapshot, query } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
 
-            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-            const app = initializeApp(firebaseConfig);
+            // =======================================================================
+            // 🛑 BƯỚC DÀNH RIÊNG CHO GITHUB: THẦY DÁN CẤU HÌNH FIREBASE VÀO ĐÂY 🛑
+            // =======================================================================
+            const myFirebaseConfig = {
+              apiKey: "AIzaSyDgeMPFNfTY6ZkuSvq3DRLqbeE6rDZCkrI",
+              authDomain: "can-8a75a.firebaseapp.com",
+              projectId: "can-8a75a",
+              storageBucket: "can-8a75a.firebasestorage.app",
+              messagingSenderId: "325640446450",
+              appId: "1:325640446450:web:bb727dc5737b3d0bf20b6b",
+              measurementId: "G-SFGDT0W6G1"
+            };
+
+            // Ưu tiên cấu hình nội bộ Canvas, nếu đem lên Github (không có cấu hình) thì dùng cái của Thầy ở trên
+            const activeFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : myFirebaseConfig;
+            
+            // Cài đặt bẫy an toàn nếu Thầy chưa dán cấu hình
+            if (!activeFirebaseConfig.apiKey) {
+                console.warn("Chưa cấu hình Firebase Đám mây. Hệ thống sẽ tạm lưu điểm ở bộ nhớ Local trình duyệt.");
+                return; // Nếu không có thì thoát để không lỗi, xài fallback cục bộ
+            }
+
+            const app = initializeApp(activeFirebaseConfig);
             const auth = getAuth(app);
             window.cloudDB = getFirestore(app);
 
@@ -1021,13 +1042,13 @@
                 mode: state.mode === 'exam' ? 'KIỂM TRA' : 'LUYỆN TẬP', score: finalScore, time: timeSpent, date: new Date().toLocaleDateString('vi-VN'), rank: rank
             };
             
-            // XÓA DỮ LIỆU LÊN MÁY CHỦ ĐÁM MÂY (FIREBASE) NẾU ĐÃ KẾT NỐI
+            // ĐẨY LÊN FIREBASE ĐÁM MÂY
             if (window.cloudUser && window.cloudDB) {
                 import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js").then(({collection, addDoc}) => {
                     addDoc(collection(window.cloudDB, 'artifacts', window.appId, 'public', 'data', 'khtn9_results'), record);
                 });
             } else {
-                // Fallback cục bộ nếu rớt mạng
+                // Fallback cục bộ nếu Thầy chưa cài Firebase hoặc bị rớt mạng
                 window.examDatabase.push(record);
                 if (document.getElementById('admin-dashboard-view').style.display === 'block') renderAdminTable();
             }
@@ -1082,7 +1103,7 @@
     }
 
     function deleteRecord(id, firebaseId) { 
-        showCustomConfirm("Xác nhận xoá bản ghi điểm này khỏi máy chủ đám mây?", function(yes) {
+        showCustomConfirm("Xác nhận xoá bản ghi điểm này?", function(yes) {
             if(yes) { 
                 if (firebaseId && window.cloudUser && window.cloudDB) {
                     import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js").then(({doc, deleteDoc}) => {
