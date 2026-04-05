@@ -7,6 +7,8 @@
     <!-- MathJax để hiển thị công thức vật lý chuẩn xác -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Thư viện SheetJS dùng để xuất file Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary-color: #0f172a;
@@ -748,7 +750,7 @@
             <div class="db-filter-group"><label>Chế độ:</label><select id="db-mode"><option value="all">Tất cả</option><option value="KIỂM TRA">Kiểm tra</option><option value="LUYỆN TẬP">Luyện tập</option></select></div>
             <div class="db-btn-group">
                 <button class="db-btn-filter db-btn-refresh" onclick="renderAdminTable()">LÀM MỚI 🔄</button>
-                <button class="db-btn-filter db-btn-export" onclick="showCustomAlert('Hệ thống lưu trữ Đám mây tự động cập nhật dữ liệu liên tục.')">XUẤT 📄</button>
+                <button class="db-btn-filter db-btn-export" onclick="exportToExcel()">XUẤT EXCEL 📄</button>
             </div>
         </div>
         <div class="db-table-wrapper">
@@ -804,9 +806,10 @@
         setTimeout(() => document.getElementById('sys-modal-box').style.transform = 'scale(1)', 10);
     }
 
+    // GHI ĐÈ hàm ALERT gốc toàn cục để nút Gợi Ý có thể hiển thị mượt mà
     window.alert = function(msg) { showCustomAlert(msg); };
 
-    // --- 2. GHI ĐÈ CÁC NÚT BẤM BỊ LỖI ---
+    // --- 2. GHI ĐÈ CÁC NÚT BẤM BỊ LỖI (NỘP BÀI VÀ VÀO THI) ĐỂ DÙNG CUSTOM MODAL ---
     window._originalShowSubmitConfirm = window._originalShowSubmitConfirm || showSubmitConfirm;
     showSubmitConfirm = function() { 
         state.isConfirming = true;
@@ -833,12 +836,13 @@
         });
     };
 
-    // --- 3. HỆ THỐNG MÁY CHỦ LƯU TRỮ ĐÁM MÂY (CLOUD STORAGE) ---
+    // --- 3. HỆ THỐNG MÁY CHỦ LƯU TRỮ ĐÁM MÂY (CLOUD STORAGE PERSISTENCE) ---
     window.examDatabase = [];
     window.timeSettings = { exam: 40, practice: 0 };
     window.currentExamTimeRemaining = 0;
     window.adminTimerPaused = false;
     
+    // Khởi tạo Cloud Database Variables
     window.cloudUser = null;
     window.cloudDB = null;
     window.appId = typeof __app_id !== 'undefined' ? __app_id : 'khtn9-app-id';
@@ -849,6 +853,9 @@
             const { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
             const { getFirestore, collection, onSnapshot, query } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
 
+            // =======================================================================
+            // 🛑 BƯỚC DÀNH RIÊNG CHO GITHUB: THẦY DÁN CẤU HÌNH FIREBASE VÀO ĐÂY 🛑
+            // =======================================================================
             const myFirebaseConfig = {
               apiKey: "AIzaSyDgeMPFNfTY6ZkuSvq3DRLqbeE6rDZCkrI",
               authDomain: "can-8a75a.firebaseapp.com",
@@ -859,10 +866,13 @@
               measurementId: "G-SFGDT0W6G1"
             };
 
+            // Ưu tiên cấu hình nội bộ Canvas, nếu đem lên Github (không có cấu hình) thì dùng cái của Thầy ở trên
             const activeFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : myFirebaseConfig;
             
+            // Cài đặt bẫy an toàn nếu Thầy chưa dán cấu hình
             if (!activeFirebaseConfig.apiKey) {
-                console.warn("Chưa cấu hình Firebase Đám mây."); return; 
+                console.warn("Chưa cấu hình Firebase Đám mây. Hệ thống sẽ tạm lưu điểm ở bộ nhớ Local trình duyệt.");
+                return; // Nếu không có thì thoát để không lỗi, xài fallback cục bộ
             }
 
             const app = initializeApp(activeFirebaseConfig);
@@ -892,7 +902,7 @@
         }
     })();
 
-    // Dashboard Btn
+    // Chèn Nút Mở Dashboard
     document.addEventListener('DOMContentLoaded', () => {
         const adminTools = document.getElementById('admin-tools');
         if(adminTools) {
@@ -926,11 +936,15 @@
     function applyTimeSetting() {
         const newExamTime = parseInt(document.getElementById('db-time-exam').value);
         const newPracticeTime = parseInt(document.getElementById('db-time-practice').value);
+        
         if (isNaN(newExamTime) || newExamTime <= 0 || isNaN(newPracticeTime) || newPracticeTime < 0) { 
-            showCustomAlert("Vui lòng nhập số phút hợp lệ! (Kiểm tra > 0, Luyện tập >= 0)"); return; 
+            showCustomAlert("Vui lòng nhập số phút hợp lệ! (Kiểm tra > 0, Luyện tập >= 0)"); 
+            return; 
         }
+
         const diffExam = newExamTime - window.timeSettings.exam;
         const diffPractice = newPracticeTime - window.timeSettings.practice;
+
         window.timeSettings.exam = newExamTime;
         window.timeSettings.practice = newPracticeTime;
 
@@ -964,7 +978,8 @@
     function adminToggleTimer() {
         if (state.finished) return;
         if (state.mode === 'practice' && window.timeSettings.practice === 0) {
-            showCustomAlert("Học sinh đang ở chế độ TỰ DO, không có thời gian để đóng băng."); return;
+            showCustomAlert("Học sinh đang ở chế độ TỰ DO, không có thời gian để đóng băng.");
+            return;
         }
         const timerEl = document.getElementById('timer');
         const btnTimer = document.getElementById('admin-btn-timer');
@@ -988,6 +1003,7 @@
     startGame = function(mode) {
         window.sessionStartTime = Date.now();
         window._originalStartGame(mode);
+
         if (mode === 'practice') {
             if (window.timeSettings.practice > 0) {
                 window.currentExamTimeRemaining = window.timeSettings.practice * 60;
@@ -997,102 +1013,44 @@
         }
     };
 
-    // --- 4. GHI ĐÈ FINISH GAME: ĐIỀU CHỈNH TOÁN HỌC THANG ĐIỂM (TỔNG 7.0 ĐIỂM) ---
-    // (GIỮ NGUYÊN 100% CODE GỐC TRONG 358 DÒNG ĐẦU TIÊN)
     window._originalFinishGame = window._originalFinishGame || finishGame;
     finishGame = function(isCheat = false) {
         const wasAlreadyFinished = state.finished;
-        
-        // Gọi hàm gốc để chạy logic kết thúc bài (hiển thị UI, tắt đồng hồ...)
         window._originalFinishGame(isCheat);
         
-        // --- THUẬT TOÁN TÍNH ĐIỂM LẠI CHO ĐÚNG BAREM 7.0 CỦA THẦY ---
-        // Phần 1: 12 câu * 0.25đ = 3đ
-        // Phần 2: 4 câu * 0.5đ = 2đ (Theo Barem Bộ GD: 1 ý=0.1; 2 ý=0.125; 3 ý=0.25; 4 ý=0.5)
-        // Phần 3: 4 câu * 0.5đ = 2đ
-        let recalculatedScore = 0;
-        
-        state.questions.forEach((q, i) => {
-            const u = state.answers[i];
-            
-            if(i < 12) { 
-                // Phần 1
-                if(q.options && u === q.correctAnswer) recalculatedScore += 0.25;
-            } else if(i < 16) { 
-                // Phần 2: Câu Đúng / Sai
-                if(q.statements) {
-                    let correctCount = 0; 
-                    const user = u || [];
-                    for(let j=0; j<4; j++) {
-                        if(user[j] === q.correctPattern[j]) correctCount++;
-                    }
-                    
-                    // Áp dụng thuật toán theo yêu cầu "mỗi ý đúng tính điểm" để Tổng phần 2 = 2.0đ
-                    // Em sử dụng tỷ lệ nội suy: Mỗi ý đúng chia đều theo giá trị max của câu là 0.5đ 
-                    // => Mỗi ý đúng = 0.125đ (Để 4 ý đúng = 0.5đ. Vừa khớp yêu cầu, vừa đảm bảo ko bị lố 7đ)
-                    recalculatedScore += (correctCount * 0.125);
-                }
-            } else { 
-                // Phần 3: Trả lời ngắn
-                if(!q.options && !q.statements) {
-                    if((u||"").toString().trim().replace('.',',') === q.answer.toString().replace('.',',')) {
-                        recalculatedScore += 0.5;
-                    }
-                }
-            }
-        });
-
-        // Xử lý làm tròn số tránh lỗi Javascript (VD: 6.999999)
-        recalculatedScore = Math.round(recalculatedScore * 100) / 100;
-
-        // Nếu admin ép full điểm (7.0)
+        // CẬP NHẬT ĐIỂM TỐI ĐA THÀNH 7.0 CHO PHÙ HỢP CẤU TRÚC ĐỀ
         if (window.adminForceFullScore && state.finished) {
-            recalculatedScore = 7.0;
-        }
-
-        // Cập nhật lại UI hiển thị kết quả dựa trên Barem 7.0
-        if (state.finished) {
-            document.getElementById('final-score').innerText = recalculatedScore;
-            
-            let rank = "CHƯA ĐẠT";
-            if(recalculatedScore >= 6.0) rank = "XUẤT SẮC";
-            else if(recalculatedScore >= 5.0) rank = "GIỎI";
-            else if(recalculatedScore >= 4.0) rank = "KHÁ";
-            else if(recalculatedScore >= 3.5) rank = "ĐẠT";
-            if(isCheat) rank = "VI PHẠM";
-
+            document.getElementById('final-score').innerText = "7.0";
+            document.getElementById('result-header').innerText = `XIN CHÚC MỪNG ${state.userInfo.name.toUpperCase()}!`;
             const rankEl = document.getElementById('rank-label');
-            rankEl.innerText = rank;
-            
-            if (isCheat) {
-                document.getElementById('result-header').innerText = "BÀI LÀM BỊ HỦY DO VI PHẠM";
-                rankEl.style.backgroundColor = "var(--danger)";
-            } else {
-                document.getElementById('result-header').innerText = `XIN CHÚC MỪNG ${state.userInfo.name.toUpperCase()}!`;
-                rankEl.style.backgroundColor = (recalculatedScore >= 4.0) ? "var(--success)" : ((recalculatedScore >= 3.5) ? "var(--warning)" : "var(--danger)");
-            }
+            rankEl.innerText = "XUẤT SẮC";
+            rankEl.style.backgroundColor = "var(--success)";
         }
 
-        // Bắn dữ liệu lên đám mây
         if(!wasAlreadyFinished && state.finished) {
+            const finalScoreStr = document.getElementById('final-score').innerText;
+            const finalScore = parseFloat(finalScoreStr.replace(',', '.')) || 0;
+            
             let timeSpent = "N/A";
             if(window.sessionStartTime) {
                 timeSpent = Math.round((Date.now() - window.sessionStartTime) / 1000) + "s";
             }
-            
-            let rankForDB = document.getElementById('rank-label').innerText || "CHƯA ĐẠT";
-            if(isCheat) rankForDB = "VI PHẠM";
+
+            let rank = document.getElementById('rank-label').innerText || "CHƯA ĐẠT";
+            if(isCheat) rank = "VI PHẠM";
 
             const record = {
                 id: Date.now(), sbd: state.userInfo.sbd || "-", name: state.userInfo.name || "-", cls: state.userInfo.class || "-", school: state.userInfo.school || "-",
-                mode: state.mode === 'exam' ? 'KIỂM TRA' : 'LUYỆN TẬP', score: recalculatedScore, time: timeSpent, date: new Date().toLocaleDateString('vi-VN'), rank: rankForDB
+                mode: state.mode === 'exam' ? 'KIỂM TRA' : 'LUYỆN TẬP', score: finalScore, time: timeSpent, date: new Date().toLocaleDateString('vi-VN'), rank: rank
             };
             
+            // ĐẨY LÊN FIREBASE ĐÁM MÂY
             if (window.cloudUser && window.cloudDB) {
                 import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js").then(({collection, addDoc}) => {
                     addDoc(collection(window.cloudDB, 'artifacts', window.appId, 'public', 'data', 'khtn9_results'), record);
                 });
             } else {
+                // Fallback cục bộ nếu Thầy chưa cài Firebase hoặc bị rớt mạng
                 window.examDatabase.push(record);
                 if (document.getElementById('admin-dashboard-view').style.display === 'block') renderAdminTable();
             }
@@ -1139,7 +1097,7 @@
         const tbody = document.getElementById('db-tbody'); tbody.innerHTML = '';
         filtered.forEach((r, index) => {
             let tr = document.createElement('tr');
-            let colorScore = r.score >= 5.0 ? '#059669' : (r.score >= 4.0 ? '#ea580c' : '#dc2626');
+            let colorScore = r.score >= 5 ? '#059669' : (r.score >= 4 ? '#ea580c' : '#dc2626');
             let fbid = r.firebaseId ? `'${r.firebaseId}'` : 'null';
             tr.innerHTML = `<td style="font-weight:bold;">${index + 1}</td><td>${r.sbd}</td><td style="font-weight:600;">${r.name}</td><td>${r.cls}</td><td>${r.school}</td><td style="text-align:center;"><span class="db-badge-mode" style="background:${r.mode==='KIỂM TRA'?'#ef4444':'#3b82f6'}">${r.mode}</span></td><td style="text-align:center; font-weight:800; font-size:1.1rem; color:${colorScore}">${r.score}</td><td>${r.time}</td><td>${r.date}</td><td style="text-align:center;"><button class="db-btn-delete" onclick="deleteRecord(${r.id}, ${fbid})" title="Xoá bản ghi">X</button></td>`;
             tbody.appendChild(tr);
@@ -1212,6 +1170,44 @@
         else msg += "=> " + q.answer; 
         showCustomAlert(msg); 
         closeAdmin(); 
+    }
+
+    // --- 4. HÀM XUẤT FILE EXCEL MỚI ĐƯỢC BỔ SUNG ---
+    function exportToExcel() {
+        if (!window.examDatabase || window.examDatabase.length === 0) {
+            showCustomAlert("Không có dữ liệu để xuất!");
+            return;
+        }
+
+        // Định dạng dữ liệu với các cột Tiếng Việt rõ ràng
+        const excelData = window.examDatabase.map((r, index) => ({
+            "STT": index + 1,
+            "SBD": r.sbd,
+            "Họ và Tên": r.name,
+            "Lớp": r.cls,
+            "Trường": r.school,
+            "Chế độ thi": r.mode,
+            "Điểm": r.score,
+            "Thời gian làm (giây)": r.time,
+            "Ngày thi": r.date,
+            "Xếp loại": r.rank
+        }));
+
+        // Khởi tạo Sheet
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "KetQuaThi");
+
+        // Căn chỉnh tự động độ rộng cột cho chuyên nghiệp
+        const wscols = [
+            {wch: 5}, {wch: 10}, {wch: 25}, {wch: 10}, {wch: 25}, 
+            {wch: 15}, {wch: 10}, {wch: 20}, {wch: 15}, {wch: 15}
+        ];
+        worksheet['!cols'] = wscols;
+
+        // Tiến hành tải file về máy
+        const fileName = `KetQua_KHTN9_ThuyPhuong_${new Date().getTime()}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
     }
 </script>
 </body>
