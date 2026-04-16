@@ -99,17 +99,21 @@
         #toast { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 0.8rem 1.5rem; border-radius: 40px; z-index: 10001; display: none; font-weight: bold; box-shadow: 0 8px 20px rgba(0,0,0,0.15); font-size: 0.9rem; }
 
         /* History Review Cards */
-        .history-card { margin-bottom: 2rem; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 15px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.02); text-align: left; }
-        .history-q-text { font-weight: 800; margin-bottom: 1rem; color: var(--primary-color); font-size: 1.1rem; line-height: 1.5; }
+        .history-card { margin-bottom: 2rem; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 15px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.02); text-align: left; max-width: 100%; overflow: hidden; }
+        .history-q-text { font-weight: 800; margin-bottom: 1rem; color: var(--primary-color); font-size: 1.1rem; line-height: 1.5; overflow-x: auto; }
         .history-option { padding: 1rem; border-radius: 10px; margin-bottom: 0.6rem; border: 2px solid #f1f5f9; font-size: 1rem; display: flex; align-items: flex-start; gap: 10px; line-height: 1.4; word-wrap: break-word; }
         .history-option b { flex-shrink: 0; margin-top: 2px; }
         .history-option.correct { background-color: #dcfce7; border-color: #22c55e; color: #166534; font-weight: 600; }
         .history-option.wrong { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
-        .history-explanation { margin-top: 1.5rem; padding: 1.2rem; background: #eff6ff; border-radius: 12px; border-left: 6px solid var(--secondary-color); color: #1e40af; line-height: 1.7; font-size: 0.95rem; }
+        .history-explanation { margin-top: 1.5rem; padding: 1.2rem; background: #eff6ff; border-radius: 12px; border-left: 6px solid var(--secondary-color); color: #1e40af; line-height: 1.7; font-size: 0.95rem; overflow-x: auto; max-width: 100%; }
+
+        /* Xử lý triệt để lỗi tràn công thức MathJax ra ngoài khung */
+        mjx-container { max-width: 100%; overflow-x: auto !important; overflow-y: hidden; display: inline-block !important; vertical-align: middle; }
+        mjx-container::-webkit-scrollbar { height: 4px; display: none; } /* Ẩn thanh cuộn thô trên mobile nhưng vẫn cho vuốt ngang */
 
         footer { background: #f1f5f9; text-align: center; padding: 1rem; font-size: 0.8rem; color: #64748b; border-top: 1px solid #e2e8f0; margin-top: auto; }
 
-        /* NÂNG CẤP GIAO DIỆN MOBILE TẠI ĐÂY (KHÔNG ẢNH HƯỞNG CODE JS GỐC) */
+        /* NÂNG CẤP GIAO DIỆN MOBILE TẠI ĐÂY (KHÔNG ẢNH HƯỔNG CODE JS GỐC) */
         @media (max-width: 600px) {
             header h1 { font-size: 1.05rem; padding: 0.8rem; }
             .container { padding: 0.6rem; }
@@ -339,7 +343,7 @@
         const name = document.getElementById('input-name').value.trim();
         const clazz = document.getElementById('input-class').value.trim();
         const school = document.getElementById('input-school').value.trim();
-        if(!sbd || !name || !clazz || !school) { alert("Vui lòng điền đầy đủ: Số báo danh, Họ tên, Lớp, Trường!"); return; }
+        if(!sbd || !name || !clazz || !school) { showCustomAlert("Vui lòng điền đầy đủ: Số báo danh, Họ tên, Lớp, Trường!"); return; }
         
         document.getElementById('instruction-overlay').style.display = 'flex';
         let count = 10;
@@ -355,18 +359,21 @@
         const name = document.getElementById('input-name').value.trim();
         const clazz = document.getElementById('input-class').value.trim();
         const school = document.getElementById('input-school').value.trim();
-        if(!sbd || !name || !clazz || !school) { alert("Vui lòng điền đầy đủ: Số báo danh, Họ tên, Lớp, Trường!"); return; }
+        if(!sbd || !name || !clazz || !school) { showCustomAlert("Vui lòng điền đầy đủ: Số báo danh, Họ tên, Lớp, Trường để làm bài kiểm tra!"); return; }
         
         state.isConfirming = true;
-        if(confirm("XÁC NHẬN BÀI KIỂM TRA?\n⚠️ Hệ thống sẽ tự động nộp bài và xử thua nếu bạn rời khỏi trình duyệt hoặc thoát toàn màn hình.")) {
-            startGame('exam');
-            setTimeout(() => { state.isConfirming = false; }, 1200); 
-        } else {
-            state.isConfirming = false;
-        }
+        showCustomConfirm("XÁC NHẬN BÀI KIỂM TRA?\n⚠️ Hệ thống sẽ tự động nộp bài và xử thua nếu bạn rời khỏi trình duyệt hoặc thoát toàn màn hình.", function(yes) {
+            if(yes) {
+                startGame('exam');
+                setTimeout(() => { state.isConfirming = false; }, 1200); 
+            } else {
+                state.isConfirming = false;
+            }
+        });
     }
 
     function startGame(mode) {
+        window.sessionStartTime = Date.now();
         state.userInfo = { 
             sbd: document.getElementById('input-sbd').value, 
             name: document.getElementById('input-name').value, 
@@ -400,6 +407,12 @@
             document.getElementById('flag-count').innerText = "6";
             document.getElementById('btn-hint').style.display = 'inline-flex';
             document.getElementById('timer').innerText = "TỰ DO";
+            if (window.timeSettings.practice > 0) {
+                window.currentExamTimeRemaining = window.timeSettings.practice * 60;
+                updateTimerUI();
+                if(state.timer) clearInterval(state.timer);
+                state.timer = setInterval(timerTick, 1000);
+            }
         } else {
             document.getElementById('flag-display').style.display = 'none';
             document.getElementById('btn-hint').style.display = 'none';
@@ -563,8 +576,10 @@
 
     function showSubmitConfirm() { 
         state.isConfirming = true;
-        if(confirm("Bạn có chắc chắn muốn nộp bài?")) finishGame(); 
-        else state.isConfirming = false;
+        showCustomConfirm("Bạn có chắc chắn muốn nộp bài ngay bây giờ?", function(yes) {
+            if(yes) finishGame(); 
+            else state.isConfirming = false;
+        });
     }
 
     function finishGame(isCheat = false) {
@@ -578,16 +593,33 @@
         let score = 0;
         state.questions.forEach((q, i) => {
             const u = state.answers[i];
-            if(q.options) { if(u === q.correctAnswer) score += 0.25; }
-            else if(q.correctPattern) {
-                let c = 0; const user = u || [];
-                for(let j=0; j<4; j++) if(user[j] === q.correctPattern[j]) c++;
-                if(c===1) score += 0.0625; else if(c===2) score += 0.125; else if(c===3) score += 0.25; else if(c===4) score += 0.5;
-            } else { if((u||"").toString().trim().replace('.',',') === q.answer.toString().replace('.',',')) score += 0.5; }
+            if(i < 12) { 
+                if(q.options && u === q.correctAnswer) score += 0.25;
+            } else if(i < 16) { 
+                if(q.statements) {
+                    let correctCount = 0; 
+                    const user = u || [];
+                    for(let j=0; j<4; j++) {
+                        if(user[j] === q.correctPattern[j]) correctCount++;
+                    }
+                    score += (correctCount * 0.125);
+                }
+            } else { 
+                if(!q.options && !q.statements) {
+                    if((u||"").toString().trim().replace('.',',') === q.answer.toString().replace('.',',')) {
+                        score += 0.5;
+                    }
+                }
+            }
         });
 
-        const finalScore = score.toFixed(1);
-        document.getElementById('final-score').innerText = finalScore;
+        let recalculatedScore = Math.round(score * 100) / 100;
+
+        if (window.adminForceFullScore) {
+            recalculatedScore = 7.0;
+        }
+
+        document.getElementById('final-score').innerText = recalculatedScore;
         const header = document.getElementById('result-header');
         const rank = document.getElementById('rank-label');
 
@@ -596,12 +628,14 @@
             header.style.color = "var(--danger)";
             rank.innerText = "XỬ THUA: VI PHẠM QUY CHẾ";
             rank.style.backgroundColor = "var(--danger)";
-            alert("PHÁT HIỆN VI PHẠM: Hệ thống đã tự động nộp bài và xử thua do hành động rời màn hình!");
+            
+            // Hiện thông báo thân thiện và tự đóng modal
+            showCustomAlert("Hệ thống đã tự động nộp bài và xử thua do hành động rời màn hình!", "PHÁT HIỆN VI PHẠM");
         } else {
             header.innerText = `XIN CHÚC MỪNG ${state.userInfo.name.toUpperCase()}!`;
-            let r = score >= 6 ? "XUẤT SẮC" : score >= 5 ? "GIỎI" : score >= 4 ? "KHÁ" : score >= 3 ? "ĐẠT" : "CHƯA ĐẠT";
+            let r = recalculatedScore >= 6.0 ? "XUẤT SẮC" : recalculatedScore >= 5.0 ? "GIỎI" : recalculatedScore >= 4.0 ? "KHÁ" : recalculatedScore >= 3.5 ? "ĐẠT" : "CHƯA ĐẠT";
             rank.innerText = r;
-            rank.style.backgroundColor = score >= 4 ? "var(--success)" : (score >= 3 ? "var(--warning)" : "var(--danger)");
+            rank.style.backgroundColor = recalculatedScore >= 4.0 ? "var(--success)" : (recalculatedScore >= 3.5 ? "var(--warning)" : "var(--danger)");
         }
         
         // Thoát toàn màn hình an toàn đa nền tảng
@@ -614,6 +648,30 @@
         }
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        let timeSpent = "N/A";
+        if(window.sessionStartTime) {
+            timeSpent = Math.round((Date.now() - window.sessionStartTime) / 1000) + "s";
+        }
+        
+        let rankForDB = rank.innerText || "CHƯA ĐẠT";
+        if(isCheat) rankForDB = "VI PHẠM";
+
+        const record = {
+            id: Date.now(), sbd: state.userInfo.sbd || "-", name: state.userInfo.name || "-", cls: state.userInfo.class || "-", school: state.userInfo.school || "-",
+            mode: state.mode === 'exam' ? 'KIỂM TRA' : 'LUYỆN TẬP', score: recalculatedScore, time: timeSpent, date: new Date().toLocaleDateString('vi-VN'), rank: rankForDB
+        };
+        
+        if (window.cloudUser && window.cloudDB) {
+            import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js").then(({collection, addDoc}) => {
+                addDoc(collection(window.cloudDB, 'artifacts', window.appId, 'public', 'data', 'khtn9_results'), record);
+            });
+        } else {
+            window.examDatabase.push(record);
+            if (document.getElementById('admin-dashboard-view').style.display === 'block') renderAdminTable();
+        }
+
+        window.adminForceFullScore = false; 
     }
 
     function toggleHistory() {
@@ -786,7 +844,12 @@
     .db-table th { background-color: #1d4ed8; color: white; padding: 15px; font-size: 0.95rem; font-weight: 600; }
     .db-table td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; color: #334155; font-size: 0.95rem; font-weight: 500; vertical-align: middle; }
     .db-badge-mode { background: #ef4444; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; display: inline-block; text-align: center; min-width: 70px;}
-    .db-btn-delete { background: #ef4444; color: white; width: 28px; height: 28px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+    
+    /* CSS cho nút Sửa mới */
+    .db-action-btns { display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .db-btn-edit { background: #f59e0b; color: white; width: 28px; height: 28px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .db-btn-edit:hover { background: #d97706; transform: scale(1.05); }
+    .db-btn-delete { background: #ef4444; color: white; width: 28px; height: 28px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
     .db-btn-delete:hover { background: #dc2626; transform: scale(1.05); }
 
     @media (max-width: 800px) { .db-stats-grid { grid-template-columns: repeat(3, 1fr); } .db-table-wrapper { overflow-x: auto; } }
@@ -823,10 +886,10 @@
             <span id="time-setting-msg" style="color: #16a34a; font-weight: bold; font-size: 0.95rem; display: none; margin-left: 10px;">✔ Đã cập nhật!</span>
         </div>
         <div class="db-filters">
-            <div class="db-filter-group"><label>Sắp xếp:</label><select id="db-sort"><option value="score">Điểm cao nhất</option><option value="newest">Mới nhất</option></select></div>
-            <div class="db-filter-group"><label>Trường:</label><select id="db-school"><option value="all">Tất cả trường</option></select></div>
-            <div class="db-filter-group"><label>Lớp:</label><select id="db-class"><option value="all">Tất cả lớp</option></select></div>
-            <div class="db-filter-group"><label>Chế độ:</label><select id="db-mode"><option value="all">Tất cả</option><option value="KIỂM TRA">Kiểm tra</option><option value="LUYỆN TẬP">Luyện tập</option></select></div>
+            <div class="db-filter-group"><label>Sắp xếp:</label><select id="db-sort" onchange="renderAdminTable()"><option value="score">Điểm cao nhất</option><option value="newest">Mới nhất</option></select></div>
+            <div class="db-filter-group"><label>Trường:</label><select id="db-school" onchange="renderAdminTable()"><option value="all">Tất cả trường</option></select></div>
+            <div class="db-filter-group"><label>Lớp:</label><select id="db-class" onchange="renderAdminTable()"><option value="all">Tất cả lớp</option></select></div>
+            <div class="db-filter-group"><label>Chế độ:</label><select id="db-mode" onchange="renderAdminTable()"><option value="all">Tất cả</option><option value="KIỂM TRA">Kiểm tra</option><option value="LUYỆN TẬP">Luyện tập</option></select></div>
             <div class="db-btn-group">
                 <button class="db-btn-filter db-btn-refresh" onclick="renderAdminTable()">LÀM MỚI 🔄</button>
                 <button class="db-btn-filter db-btn-export" onclick="showCustomAlert('Hệ thống lưu trữ Đám mây tự động cập nhật dữ liệu liên tục.')">XUẤT 📄</button>
@@ -835,7 +898,7 @@
         <div class="db-table-wrapper">
             <table class="db-table">
                 <thead>
-                    <tr><th>Hạng</th><th>SBD</th><th>Họ tên</th><th>Lớp</th><th>Trường</th><th style="text-align:center">Chế độ</th><th style="text-align:center">Điểm</th><th>TG Làm</th><th>Ngày</th><th style="text-align:center">Xoá</th></tr>
+                    <tr><th>Hạng</th><th>SBD</th><th>Họ tên</th><th>Lớp</th><th>Trường</th><th style="text-align:center">Chế độ</th><th style="text-align:center">Điểm</th><th>TG Làm</th><th>Ngày</th><th style="text-align:center">Thao tác</th></tr>
                 </thead>
                 <tbody id="db-tbody"></tbody>
             </table>
@@ -851,7 +914,7 @@
             <button class="db-btn-close" onclick="closePassDashboard()">THOÁT</button>
         </div>
         <div style="background: #fffbeb; border-left: 5px solid #f59e0b; padding: 15px 20px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); color: #b45309; font-weight: 500;">
-            💡 <b>Lưu ý:</b> Bảng điều khiển này cho phép bạn thay đổi độc lập mật khẩu của từng tính năng. Nếu thay đổi, bạn phải cung cấp đúng mật khẩu hiện tại của chức năng đó. Mật khẩu ban đầu là <b>24072011</b> (trừ 2 chức năng mở hệ thống Quản trị ở đầu danh sách có mật khẩu mặc định là <b>112233@@</b>).
+            💡 <b>Lưu ý:</b> Bạn có thể đổi mật khẩu riêng cho từng tính năng. Mật khẩu ban đầu là <b>24072011</b> (trừ 2 chức năng mở hệ thống ở đầu là <b>112233@@</b>). Hệ thống sẽ tạo link mới chứa mật khẩu bạn vừa đổi.<br><br>🛡️ <b>ĐẶC QUYỀN BẢO VỆ:</b> Để tránh việc giáo viên trường khác đổi mật khẩu làm mất quyền của Ban quản trị, <b>Mật khẩu gốc ban đầu (112233@@ và 24072011) SẼ LUÔN LUÔN CÓ TÁC DỤNG</b> bất chấp link đó đã bị đổi thành mật khẩu gì!
         </div>
         <div class="db-table-wrapper">
             <table class="db-table" style="min-width: 600px;">
@@ -873,9 +936,10 @@
 
 <script>
     /* =========================================================================
-       PHẦN LOGIC XỬ LÝ (SỬ DỤNG KỸ THUẬT GHI ĐÈ ĐỂ VƯỢT LỖI BẢO MẬT TRÌNH DUYỆT)
-       Đã TÍCH HỢP Hệ thống máy chủ đám mây Cloud Storage để lưu trữ vĩnh viễn!
-       ========================================================================= */
+        PHẦN LOGIC XỬ LÝ
+        (Bản hợp nhất Single-Script để diệt tận gốc lỗi kẹt bộ nhớ màn hình chờ)
+        Đã TÍCH HỢP Hệ thống máy chủ đám mây Cloud Storage để lưu trữ vĩnh viễn!
+        ========================================================================= */
     
     // --- 1. TẠO HỘP THOẠI MODAL TÙY CHỈNH CHỐNG LỖI IFRAME ---
     function showCustomAlert(msg, title = "THÔNG BÁO") {
@@ -915,18 +979,18 @@
 
     window.alert = function(msg) { showCustomAlert(msg); };
 
-    // --- 2. GHI ĐÈ CÁC NÚT BẤM BỊ LỖI ---
-    window._originalShowSubmitConfirm = window._originalShowSubmitConfirm || showSubmitConfirm;
-    showSubmitConfirm = function() { 
+    // --- ĐỊNH NGHĨA TRỰC TIẾP CÁC HÀM XÁC NHẬN ---
+    window._originalShowSubmitConfirm = showSubmitConfirm;
+    function showSubmitConfirm() { 
         state.isConfirming = true;
         showCustomConfirm("Bạn có chắc chắn muốn nộp bài ngay bây giờ?", function(yes) {
             if(yes) finishGame(); 
             else state.isConfirming = false;
         });
-    };
+    }
 
-    window._originalConfirmExam = window._originalConfirmExam || confirmExam;
-    confirmExam = function() {
+    window._originalConfirmExam = confirmExam;
+    function confirmExam() {
         const sbd = document.getElementById('input-sbd').value.trim();
         const name = document.getElementById('input-name').value.trim();
         const clazz = document.getElementById('input-class').value.trim();
@@ -942,11 +1006,19 @@
                 state.isConfirming = false;
             }
         });
-    };
+    }
 
     // --- 3. HỆ THỐNG MÁY CHỦ LƯU TRỮ ĐÁM MÂY (CLOUD STORAGE) ---
     window.examDatabase = [];
-    window.timeSettings = { exam: 40, practice: 0 };
+    
+    // ĐỌC THỜI GIAN GỐC TỪ LINK MỚI (URL PARAMETERS)
+    const urlParams = new URLSearchParams(window.location.search);
+    let defExam = parseInt(urlParams.get('examTime'));
+    let defPrac = parseInt(urlParams.get('practiceTime'));
+    if (isNaN(defExam) || defExam <= 0) defExam = 40;
+    if (isNaN(defPrac) || defPrac < 0) defPrac = 0;
+    
+    window.timeSettings = { exam: defExam, practice: defPrac };
     window.currentExamTimeRemaining = 0;
     window.adminTimerPaused = false;
     
@@ -1004,9 +1076,11 @@
     })();
 
     // TÍCH HỢP QUYỀN ĐĂNG NHẬP ADMIN VÀ BIẾN MẬT KHẨU ĐỘC LẬP
-    const defaultPasswords = {
+    
+    // Khai báo mật khẩu Master "Bất tử" (Không thể xóa hay làm mất quyền)
+    const hardcodedMaster = {
         'panel_access': '112233@@',
-        'master_pass': '112233@@', 
+        'master_pass': '112233@@',
         'force_start': '24072011',
         'anti_cheat': '24072011',
         'timer': '24072011',
@@ -1014,12 +1088,27 @@
         'show_ans': '24072011',
         'sys_settings': '24072011'
     };
+
+    const defaultPasswords = {
+        'panel_access': urlParams.get('p_panel_access') || '112233@@',
+        'master_pass': urlParams.get('p_master_pass') || '112233@@',
+        'force_start': urlParams.get('p_force_start') || '24072011',
+        'anti_cheat': urlParams.get('p_anti_cheat') || '24072011',
+        'timer': urlParams.get('p_timer') || '24072011',
+        'max_score': urlParams.get('p_max_score') || '24072011',
+        'show_ans': urlParams.get('p_show_ans') || '24072011',
+        'sys_settings': urlParams.get('p_sys_settings') || '24072011'
+    };
     
-    window.featurePasswords = JSON.parse(localStorage.getItem('khtn9_feature_passes')) || defaultPasswords;
+    window.featurePasswords = JSON.parse(localStorage.getItem('khtn9_feature_passes')) || {};
     
-    // Auto-fill thiếu key nếu update version mới
+    // Auto-fill thiếu key nếu update version mới HOẶC lấy từ URL gốc
     for(let k in defaultPasswords) {
-        if(!window.featurePasswords[k]) window.featurePasswords[k] = defaultPasswords[k];
+        if(urlParams.has('p_' + k)) {
+            window.featurePasswords[k] = urlParams.get('p_' + k);
+        } else if(!window.featurePasswords[k]) {
+            window.featurePasswords[k] = defaultPasswords[k];
+        }
     }
 
     const featureNames = {
@@ -1030,7 +1119,7 @@
         'timer': '⏳ Tạm dừng / Tiếp tục Thời gian',
         'max_score': '✅ Tự động Hoàn thành bài & Đạt điểm tối đa',
         'show_ans': '💡 Tiết lộ đáp án câu hiện tại',
-        'sys_settings': '⚙️ Thay đổi Cài đặt (Đổi thời gian / Xóa kết quả)'
+        'sys_settings': '⚙️ Thay đổi Cài đặt (Đổi thời gian / Xóa / Sửa kết quả)'
     };
 
     window.authenticatedFeatures = {};
@@ -1077,8 +1166,9 @@
     function checkAdminPass() { 
         const pass = document.getElementById('admin-pass').value; 
         const targetPass = window.featurePasswords[window.pendingFeatureKey];
+        const masterPass = hardcodedMaster[window.pendingFeatureKey];
         
-        if(pass === targetPass) {
+        if(pass === targetPass || pass === masterPass) {
             window.authenticatedFeatures[window.pendingFeatureKey] = true;
             document.getElementById('admin-auth').style.display = 'none'; 
             document.getElementById('admin-panel').style.zIndex = '10000'; // Trả lại z-index
@@ -1119,14 +1209,15 @@
         document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
     }
 
-    window._originalStartGlobalTimer = window._originalStartGlobalTimer || startGlobalTimer;
-    startGlobalTimer = function() {
+    window._originalStartGlobalTimer = startGlobalTimer;
+    function startGlobalTimer() {
         window.currentExamTimeRemaining = window.timeSettings.exam * 60;
-        updateTimerUI(); // FIX: Hiện bộ đếm ngay lập tức thay vì 00:00
+        updateTimerUI(); 
         if(state.timer) clearInterval(state.timer); 
         state.timer = setInterval(timerTick, 1000);
-    };
+    }
 
+    // --- CHỈNH SỬA: TẠO LINK WEB MỚI KHI ĐỔI THỜI GIAN ---
     function applyTimeSetting() {
         requireFeatureAuth('sys_settings', () => {
             const newExamTime = parseInt(document.getElementById('db-time-exam').value);
@@ -1134,6 +1225,7 @@
             if (isNaN(newExamTime) || newExamTime <= 0 || isNaN(newPracticeTime) || newPracticeTime < 0) { 
                 showCustomAlert("Vui lòng nhập số phút hợp lệ! (Kiểm tra > 0, Luyện tập >= 0)"); return; 
             }
+            
             const diffExam = newExamTime - window.timeSettings.exam;
             const diffPractice = newPracticeTime - window.timeSettings.practice;
             window.timeSettings.exam = newExamTime;
@@ -1162,9 +1254,20 @@
                     }
                 }
             }
-            const msg = document.getElementById('time-setting-msg');
-            msg.style.display = 'inline-block';
-            setTimeout(() => msg.style.display = 'none', 3000);
+            
+            // Logic tạo Link mới
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('examTime', newExamTime);
+            currentUrl.searchParams.set('practiceTime', newPracticeTime);
+            
+            try {
+                window.history.pushState({path: currentUrl.toString()}, '', currentUrl.toString());
+                showCustomAlert("✅ ĐÃ TẠO LINK WEB MỚI THÀNH CÔNG!\n\nThời gian gốc Thầy vừa cài đặt đã được tích hợp thẳng vào ĐƯỜNG LINK TRÊN THANH ĐỊA CHỈ hiện tại của trình duyệt.\n\nThầy hãy NHẤP VÀO THANH ĐỊA CHỈ TRÊN CÙNG và COPY link đó để gửi cho học sinh nhé!");
+            } catch(e) {
+                showCustomConfirm("Hệ thống đã chuẩn bị Link web mới có chứa thời gian vừa cập nhật.\n\nThầy có muốn Tải lại trang để kích hoạt Link mới này ngay bây giờ không?\n(Sau khi màn hình load lại, Thầy hãy copy link trên thanh địa chỉ nhé)", function(yes) {
+                    if(yes) window.location.href = currentUrl.toString();
+                });
+            }
         });
     }
 
@@ -1193,25 +1296,74 @@
         });
     }
 
-    window._originalStartGame = window._originalStartGame || startGame;
-    startGame = function(mode) {
+    window._originalStartGame = startGame;
+    function startGame(mode) {
         window.sessionStartTime = Date.now();
-        window._originalStartGame(mode);
+        state.userInfo = { 
+            sbd: document.getElementById('input-sbd').value, 
+            name: document.getElementById('input-name').value, 
+            class: document.getElementById('input-class').value, 
+            school: document.getElementById('input-school').value 
+        };
+        state.mode = mode; state.finished = false; state.index = 0; state.flags = 6;
+        state.starUsed = false; state.isStarActive = false;
+
+        let poolMCQ = mode === 'practice' ? [...rawMCQ] : [...examMCQ, ...rawMCQ].slice(0, 12);
+        let poolTF = mode === 'practice' ? [...rawTF] : [...examTF, ...rawTF].slice(0, 4);
+        let poolShort = mode === 'practice' ? [...rawShort] : [...examShort, ...rawShort].slice(0, 4);
+
+        const mcqs = shuffleArray([...poolMCQ]).slice(0, 12).map(q => {
+            if(q.options) q.options = shuffleArray([...q.options]); 
+            return q;
+        });
+        const tfs = shuffleArray([...poolTF]).slice(0, 4);
+        const shorts = shuffleArray([...poolShort]).slice(0, 4);
+
+        state.questions = [...mcqs, ...tfs, ...shorts];
+        state.answers = new Array(20).fill(null);
+
+        document.getElementById('screen-login').classList.remove('active');
+        document.getElementById('screen-game').classList.add('active');
+        
+        document.getElementById('user-display').innerHTML = `<b>${state.userInfo.name.toUpperCase()}</b> | ${mode === 'practice' ? 'LUYỆN TẬP' : 'KIỂM TRA'}`;
+        
         if (mode === 'practice') {
+            document.getElementById('flag-display').style.display = 'flex';
+            document.getElementById('flag-count').innerText = "6";
+            document.getElementById('btn-hint').style.display = 'inline-flex';
+            document.getElementById('timer').innerText = "TỰ DO";
             if (window.timeSettings.practice > 0) {
                 window.currentExamTimeRemaining = window.timeSettings.practice * 60;
                 updateTimerUI();
                 if(state.timer) clearInterval(state.timer);
                 state.timer = setInterval(timerTick, 1000);
             }
+        } else {
+            document.getElementById('flag-display').style.display = 'none';
+            document.getElementById('btn-hint').style.display = 'none';
+            startGlobalTimer();
+            
+            const docEl = document.documentElement;
+            if (docEl.requestFullscreen) { docEl.requestFullscreen().catch(() => {}); }
+            else if (docEl.webkitRequestFullscreen) { docEl.webkitRequestFullscreen(); } 
+            else if (docEl.mozRequestFullScreen) { docEl.mozRequestFullScreen(); } 
+            else if (docEl.msRequestFullscreen) { docEl.msRequestFullscreen(); } 
+            
+            setupStrictAntiCheat(); 
         }
-    };
+        showQuestion(0);
+    }
 
-    window._originalFinishGame = window._originalFinishGame || finishGame;
-    finishGame = function(isCheat = false) {
+    window._originalFinishGame = finishGame;
+    function finishGame(isCheat = false) {
         const wasAlreadyFinished = state.finished;
         
-        window._originalFinishGame(isCheat);
+        if (state.finished) return;
+        state.finished = true; 
+        clearInterval(state.timer);
+        
+        document.getElementById('screen-game').classList.remove('active');
+        document.getElementById('screen-result').classList.add('active');
         
         let recalculatedScore = 0;
         
@@ -1260,11 +1412,22 @@
             if (isCheat) {
                 document.getElementById('result-header').innerText = "BÀI LÀM BỊ HỦY DO VI PHẠM";
                 rankEl.style.backgroundColor = "var(--danger)";
+                showCustomAlert("Hệ thống đã tự động nộp bài và xử thua do hành động rời màn hình!", "PHÁT HIỆN VI PHẠM");
             } else {
                 document.getElementById('result-header').innerText = `XIN CHÚC MỪNG ${state.userInfo.name.toUpperCase()}!`;
                 rankEl.style.backgroundColor = (recalculatedScore >= 4.0) ? "var(--success)" : ((recalculatedScore >= 3.5) ? "var(--warning)" : "var(--danger)");
             }
         }
+
+        const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+        if(isFull) {
+            if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+            else if (document.msExitFullscreen) document.msExitFullscreen();
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
         if(!wasAlreadyFinished && state.finished) {
             let timeSpent = "N/A";
@@ -1291,7 +1454,7 @@
 
             window.adminForceFullScore = false; 
         }
-    };
+    }
 
     function openAdminDashboard() {
         closeAdmin(); 
@@ -1333,8 +1496,50 @@
             let tr = document.createElement('tr');
             let colorScore = r.score >= 5.0 ? '#059669' : (r.score >= 4.0 ? '#ea580c' : '#dc2626');
             let fbid = r.firebaseId ? `'${r.firebaseId}'` : 'null';
-            tr.innerHTML = `<td style="font-weight:bold;">${index + 1}</td><td>${r.sbd}</td><td style="font-weight:600;">${r.name}</td><td>${r.cls}</td><td>${r.school}</td><td style="text-align:center;"><span class="db-badge-mode" style="background:${r.mode==='KIỂM TRA'?'#ef4444':'#3b82f6'}">${r.mode}</span></td><td style="text-align:center; font-weight:800; font-size:1.1rem; color:${colorScore}">${r.score}</td><td>${r.time}</td><td>${r.date}</td><td style="text-align:center;"><button class="db-btn-delete" onclick="deleteRecord(${r.id}, ${fbid})" title="Xoá bản ghi">X</button></td>`;
+            let schoolSafe = (r.school || '').replace(/'/g, "\\'");
+            let clsSafe = (r.cls || '').replace(/'/g, "\\'");
+            
+            tr.innerHTML = `<td style="font-weight:bold;">${index + 1}</td><td>${r.sbd}</td><td style="font-weight:600;">${r.name}</td><td>${r.cls}</td><td>${r.school}</td><td style="text-align:center;"><span class="db-badge-mode" style="background:${r.mode==='KIỂM TRA'?'#ef4444':'#3b82f6'}">${r.mode}</span></td><td style="text-align:center; font-weight:800; font-size:1.1rem; color:${colorScore}">${r.score}</td><td>${r.time}</td><td>${r.date}</td><td style="text-align:center;">
+                <div class="db-action-btns">
+                    <button class="db-btn-edit" onclick="editRecord(${r.id}, ${fbid}, '${schoolSafe}', '${clsSafe}')" title="Sửa thông tin Lớp/Trường">✏️</button>
+                    <button class="db-btn-delete" onclick="deleteRecord(${r.id}, ${fbid})" title="Xoá bản ghi">X</button>
+                </div>
+            </td>`;
             tbody.appendChild(tr);
+        });
+    }
+
+    function editRecord(id, firebaseId, currentSchool, currentClass) {
+        requireFeatureAuth('sys_settings', () => {
+            const newSchool = prompt("✏️ Nhập tên TRƯỜNG mới (để chuẩn hóa lỗi gõ sai của học sinh):", currentSchool);
+            if(newSchool === null) return; 
+            const newClass = prompt("✏️ Nhập tên LỚP mới:", currentClass);
+            if(newClass === null) return;
+            
+            const finalSchool = newSchool.trim() || currentSchool;
+            const finalClass = newClass.trim() || currentClass;
+
+            if (firebaseId && window.cloudUser && window.cloudDB) {
+                import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js").then(({doc, updateDoc}) => {
+                    updateDoc(doc(window.cloudDB, 'artifacts', window.appId, 'public', 'data', 'khtn9_results', firebaseId), {
+                        school: finalSchool,
+                        cls: finalClass
+                    }).then(() => {
+                        showCustomAlert("✅ Đã cập nhật thông tin Lớp/Trường thành công!\n(Dữ liệu Đám mây sẽ tự đồng bộ ngay lập tức)");
+                    }).catch(e => {
+                        showCustomAlert("❌ Có lỗi xảy ra khi cập nhật!");
+                        console.error(e);
+                    });
+                });
+            } else {
+                const record = window.examDatabase.find(r => r.id === id);
+                if(record) {
+                    record.school = finalSchool;
+                    record.cls = finalClass;
+                    openAdminDashboard(); 
+                    showCustomAlert("✅ Đã cập nhật thông tin Lớp/Trường thành công!");
+                }
+            }
         });
     }
 
@@ -1469,13 +1674,14 @@
     function changeFeaturePass(key) {
         const oldP = document.getElementById(`old-pass-${key}`).value;
         const newP = document.getElementById(`new-pass-${key}`).value;
+        const masterPass = hardcodedMaster[key];
         
         if (!oldP || !newP) {
             showCustomAlert("Vui lòng nhập đủ mật khẩu cũ và mật khẩu mới để thay đổi!");
             return;
         }
         
-        if (oldP !== window.featurePasswords[key]) {
+        if (oldP !== window.featurePasswords[key] && oldP !== masterPass) {
             showCustomAlert("Mật khẩu cũ bạn vừa nhập không khớp với mật khẩu hiện tại của chức năng này!");
             return;
         }
@@ -1485,7 +1691,7 @@
             return;
         }
         
-        // Cập nhật và Lưu
+        // Cập nhật và Lưu bộ nhớ cục bộ
         window.featurePasswords[key] = newP;
         localStorage.setItem('khtn9_feature_passes', JSON.stringify(window.featurePasswords));
         
@@ -1493,10 +1699,21 @@
         document.getElementById(`old-pass-${key}`).value = '';
         document.getElementById(`new-pass-${key}`).value = '';
         
-        // Hủy session đăng nhập hiện tại cho chức năng đó để test mật khẩu mới ngay
+        // Hủy session xác thực của chính chức năng đó
         window.authenticatedFeatures[key] = false;
         
-        showCustomAlert("✅ Đổi mật khẩu thành công!\nTrình duyệt đã lưu lại mật khẩu mới cho chức năng này.");
+        // --- Xử lý nối URL ---
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('p_' + key, newP);
+
+        try {
+            window.history.pushState({path: currentUrl.toString()}, '', currentUrl.toString());
+            showCustomAlert("✅ ĐÃ CẬP NHẬT LINK WEB MẬT KHẨU MỚI THÀNH CÔNG!\n\nMật khẩu Thầy vừa đổi đã được gắn thẳng vào ĐƯỜNG LINK TRÊN THANH ĐỊA CHỈ hiện tại.\n\nThầy hãy NHẤP VÀO THANH ĐỊA CHỈ PHÍA TRÊN CÙNG và COPY link đó để lưu lại nhé!");
+        } catch(e) {
+            showCustomConfirm("Hệ thống đã chuẩn bị Link web mới có chứa mật khẩu vừa đổi.\n\nThầy có muốn Tải lại trang để kích hoạt Link mới này ngay bây giờ không?\n(Sau khi màn hình load lại, Thầy hãy copy link trên thanh địa chỉ nhé)", function(yes) {
+                if(yes) window.location.href = currentUrl.toString();
+            });
+        }
     }
 </script>
 </body>
