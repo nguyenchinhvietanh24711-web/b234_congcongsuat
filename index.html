@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ôn tập KHTN 9: Năng lượng và Công - THCS Thủy Phương</title>
-    <!-- MathJax để hiển thị công thức vật lý chuẩn xác -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <!-- MathJax để hiển thị công thức vật lý chuẩn xác (Đã loại bỏ polyfill độc hại) -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         :root {
@@ -74,6 +73,7 @@
         .question-text { font-size: 1.15rem; line-height: 1.6; margin-bottom: 1.5rem; color: #1e293b; font-weight: 500; text-align: left; }
 
         .option-item { padding: 1rem; border: 2px solid #f1f5f9; border-radius: 12px; cursor: pointer; margin-bottom: 0.8rem; transition: 0.2s; font-size: 1.05rem; background: #fff; display: flex; align-items: center; gap: 10px; text-align: left; }
+        .option-item b { flex-shrink: 0; } /* Khóa chữ A,B,C,D không bị bóp méo khi đáp án dài */
         .option-item:hover { background-color: #f8fafc; border-color: #cbd5e1; }
         .option-item.selected { border-color: var(--secondary-color); background-color: #eff6ff; font-weight: 700; box-shadow: 0 4px 10px rgba(29, 78, 216, 0.1); }
 
@@ -101,7 +101,8 @@
         /* History Review Cards */
         .history-card { margin-bottom: 2rem; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 15px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.02); text-align: left; }
         .history-q-text { font-weight: 800; margin-bottom: 1rem; color: var(--primary-color); font-size: 1.1rem; line-height: 1.5; }
-        .history-option { padding: 1rem; border-radius: 10px; margin-bottom: 0.6rem; border: 2px solid #f1f5f9; font-size: 1rem; display: flex; align-items: center; gap: 10px; }
+        .history-option { padding: 1rem; border-radius: 10px; margin-bottom: 0.6rem; border: 2px solid #f1f5f9; font-size: 1rem; display: flex; align-items: flex-start; gap: 10px; line-height: 1.4; word-wrap: break-word; }
+        .history-option b { flex-shrink: 0; margin-top: 2px; }
         .history-option.correct { background-color: #dcfce7; border-color: #22c55e; color: #166534; font-weight: 600; }
         .history-option.wrong { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
         .history-explanation { margin-top: 1.5rem; padding: 1.2rem; background: #eff6ff; border-radius: 12px; border-left: 6px solid var(--secondary-color); color: #1e40af; line-height: 1.7; font-size: 0.95rem; }
@@ -128,8 +129,12 @@
             /* Tùy chỉnh nội dung câu hỏi cho vừa khung */
             .question-header { flex-direction: column; align-items: flex-start; gap: 6px; font-size: 1.1rem; }
             .question-text { font-size: 1.05rem; overflow-x: auto; padding-bottom: 5px; } /* Cho phép thanh cuộn ngang cục bộ nếu công thức siêu dài */
-            .option-item { font-size: 0.95rem; align-items: flex-start; overflow-x: auto; }
-            .tf-statement { font-size: 0.95rem; }
+            .option-item { font-size: 0.95rem; align-items: flex-start; padding: 0.8rem; line-height: 1.45; word-wrap: break-word; } /* Sửa lỗi cuộn ngang, bẻ dòng đáp án gọn gàng */
+            .option-item b { margin-top: 1px; }
+            .tf-statement { font-size: 0.95rem; margin-bottom: 12px; line-height: 1.45; }
+            .tf-buttons { gap: 8px; }
+            .btn-tf { padding: 0.8rem; font-size: 0.95rem; } /* Tăng tiết diện bấm cho màn cảm ứng */
+            .short-answer-input { font-size: 1.2rem; padding: 0.8rem; }
             
             /* Thu nhỏ lại Nút bấm */
             .btn { width: 100%; padding: 0.8rem; font-size: 0.9rem; justify-content: center; }
@@ -399,9 +404,14 @@
             document.getElementById('flag-display').style.display = 'none';
             document.getElementById('btn-hint').style.display = 'none';
             startGlobalTimer();
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(() => {});
-            }
+            
+            // --- Ép bật Toàn màn hình đa nền tảng (Điện thoại & PC) ---
+            const docEl = document.documentElement;
+            if (docEl.requestFullscreen) { docEl.requestFullscreen().catch(() => {}); }
+            else if (docEl.webkitRequestFullscreen) { docEl.webkitRequestFullscreen(); } /* Safari/Chrome iOS/Android */
+            else if (docEl.mozRequestFullScreen) { docEl.mozRequestFullScreen(); } /* Firefox */
+            else if (docEl.msRequestFullscreen) { docEl.msRequestFullscreen(); } /* Edge/IE */
+            
             setupStrictAntiCheat(); 
         }
         showQuestion(0);
@@ -439,7 +449,11 @@
         }
 
         box.innerHTML = headerHtml + contentHtml;
-        MathJax.typeset();
+        
+        // Bảo vệ an toàn khi tải MathJax
+        if (typeof MathJax !== 'undefined' && MathJax.typeset) {
+            try { MathJax.typeset(); } catch (err) { console.warn('MathJax delay', err); }
+        }
         
         const starBtn = document.getElementById('btn-star');
         if(idx >= 16 && !state.starUsed && state.mode === 'practice') {
@@ -465,6 +479,7 @@
         showQuestion(state.index); 
     }
 
+    // -- CHỨC NĂNG MỚI: XÁC NHẬN CHỐT ĐÁP ÁN KHI ẤN TIẾP THEO --
     function validateAndNext() {
         if(state.isReviewing) { changeQuestion(1); return; }
         
@@ -513,7 +528,9 @@
         state.isReviewing = true;
         document.getElementById('review-box').style.display = 'block';
         document.getElementById('review-content').innerHTML = exp;
-        MathJax.typeset();
+        if (typeof MathJax !== 'undefined' && MathJax.typeset) {
+            try { MathJax.typeset(); } catch (err) {}
+        }
     }
 
     function changeQuestion(dir) {
@@ -532,9 +549,16 @@
         };
         window.onblur = handleViolation;
         document.onvisibilitychange = () => { if(document.hidden) handleViolation(); };
-        document.onfullscreenchange = () => { 
-            if(!document.fullscreenElement && state.mode === 'exam' && !state.finished && !state.isConfirming) handleViolation();
+        
+        // Theo dõi việc thoát toàn màn hình trên TẤT CẢ các trình duyệt di động/PC
+        const checkFullscreen = () => { 
+            const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+            if(!isFull && state.mode === 'exam' && !state.finished && !state.isConfirming) handleViolation();
         };
+        document.onfullscreenchange = checkFullscreen;
+        document.onwebkitfullscreenchange = checkFullscreen;
+        document.onmozfullscreenchange = checkFullscreen;
+        document.onmsfullscreenchange = checkFullscreen;
     }
 
     function showSubmitConfirm() { 
@@ -579,7 +603,16 @@
             rank.innerText = r;
             rank.style.backgroundColor = score >= 4 ? "var(--success)" : (score >= 3 ? "var(--warning)" : "var(--danger)");
         }
-        if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+        
+        // Thoát toàn màn hình an toàn đa nền tảng
+        const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+        if(isFull) {
+            if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+            else if (document.msExitFullscreen) document.msExitFullscreen();
+        }
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -623,7 +656,9 @@
             list.appendChild(card);
         });
 
-        MathJax.typeset();
+        if (typeof MathJax !== 'undefined' && MathJax.typeset) {
+            try { MathJax.typeset(); } catch (err) {}
+        }
         area.scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -644,13 +679,10 @@
     }
 
     function startGlobalTimer() {
-        let totalTime = 40 * 60; 
-        state.timer = setInterval(() => {
-            totalTime--; 
-            if(totalTime <= 0) finishGame();
-            const m = Math.floor(totalTime / 60); const s = totalTime % 60;
-            document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-        }, 1000);
+        window.currentExamTimeRemaining = window.timeSettings.exam * 60;
+        updateTimerUI(); // Sửa lỗi 00:00 ở giây đầu tiên
+        if(state.timer) clearInterval(state.timer); 
+        state.timer = setInterval(timerTick, 1000);
     }
 
     function showToast(msg) {
@@ -661,7 +693,6 @@
 
 <!-- =====================================================================================
      HỆ THỐNG GIAO DIỆN BẢO MẬT & QUẢN TRỊ VIÊN (APPENDED MODULE CLOUD STORAGE)
-     Tuyệt đối không sửa bất kỳ hàm gốc nào, hệ thống sử dụng Custom Modal để chống chặn Iframe!
      ===================================================================================== -->
 
 <!-- 1. HỘP THOẠI MODAL THÔNG BÁO TÙY CHỈNH (THAY THẾ CHỨC NĂNG ALERT/CONFIRM GỐC) -->
@@ -975,7 +1006,7 @@
     // TÍCH HỢP QUYỀN ĐĂNG NHẬP ADMIN VÀ BIẾN MẬT KHẨU ĐỘC LẬP
     const defaultPasswords = {
         'panel_access': '112233@@',
-        'master_pass': '112233@@', // Mật khẩu mới bảo vệ Bảng đổi mật khẩu
+        'master_pass': '112233@@', 
         'force_start': '24072011',
         'anti_cheat': '24072011',
         'timer': '24072011',
@@ -1073,7 +1104,15 @@
         } 
     }
 
-    // Dashboard Btn thêm vào tools panel
+    function timerTick() {
+        window.currentExamTimeRemaining--;
+        if(window.currentExamTimeRemaining <= 0) {
+            clearInterval(state.timer);
+            finishGame();
+        }
+        updateTimerUI();
+    }
+
     function updateTimerUI() {
         const m = Math.floor(Math.max(0, window.currentExamTimeRemaining) / 60);
         const s = Math.max(0, window.currentExamTimeRemaining) % 60;
@@ -1083,6 +1122,7 @@
     window._originalStartGlobalTimer = window._originalStartGlobalTimer || startGlobalTimer;
     startGlobalTimer = function() {
         window.currentExamTimeRemaining = window.timeSettings.exam * 60;
+        updateTimerUI(); // FIX: Hiện bộ đếm ngay lập tức thay vì 00:00
         if(state.timer) clearInterval(state.timer); 
         state.timer = setInterval(timerTick, 1000);
     };
@@ -1111,6 +1151,7 @@
                     } else {
                         if (window.timeSettings.practice - diffPractice === 0) {
                             window.currentExamTimeRemaining = newPracticeTime * 60;
+                            updateTimerUI();
                             if(state.timer) clearInterval(state.timer);
                             state.timer = setInterval(timerTick, 1000);
                         } else {
@@ -1159,49 +1200,36 @@
         if (mode === 'practice') {
             if (window.timeSettings.practice > 0) {
                 window.currentExamTimeRemaining = window.timeSettings.practice * 60;
+                updateTimerUI();
                 if(state.timer) clearInterval(state.timer);
                 state.timer = setInterval(timerTick, 1000);
             }
         }
     };
 
-    // --- 4. GHI ĐÈ FINISH GAME: ĐIỀU CHỈNH TOÁN HỌC THANG ĐIỂM (TỔNG 7.0 ĐIỂM) ---
-    // (GIỮ NGUYÊN 100% CODE GỐC TRONG 358 DÒNG ĐẦU TIÊN)
     window._originalFinishGame = window._originalFinishGame || finishGame;
     finishGame = function(isCheat = false) {
         const wasAlreadyFinished = state.finished;
         
-        // Gọi hàm gốc để chạy logic kết thúc bài (hiển thị UI, tắt đồng hồ...)
         window._originalFinishGame(isCheat);
         
-        // --- THUẬT TOÁN TÍNH ĐIỂM LẠI CHO ĐÚNG BAREM 7.0 CỦA THẦY ---
-        // Phần 1: 12 câu * 0.25đ = 3đ
-        // Phần 2: 4 câu * 0.5đ = 2đ (Theo Barem Bộ GD: 1 ý=0.1; 2 ý=0.125; 3 ý=0.25; 4 ý=0.5)
-        // Phần 3: 4 câu * 0.5đ = 2đ
         let recalculatedScore = 0;
         
         state.questions.forEach((q, i) => {
             const u = state.answers[i];
             
             if(i < 12) { 
-                // Phần 1
                 if(q.options && u === q.correctAnswer) recalculatedScore += 0.25;
             } else if(i < 16) { 
-                // Phần 2: Câu Đúng / Sai
                 if(q.statements) {
                     let correctCount = 0; 
                     const user = u || [];
                     for(let j=0; j<4; j++) {
                         if(user[j] === q.correctPattern[j]) correctCount++;
                     }
-                    
-                    // Áp dụng thuật toán theo yêu cầu "mỗi ý đúng tính điểm" để Tổng phần 2 = 2.0đ
-                    // Em sử dụng tỷ lệ nội suy: Mỗi ý đúng chia đều theo giá trị max của câu là 0.5đ 
-                    // => Mỗi ý đúng = 0.125đ (Để 4 ý đúng = 0.5đ. Vừa khớp yêu cầu, vừa đảm bảo ko bị lố 7đ)
                     recalculatedScore += (correctCount * 0.125);
                 }
             } else { 
-                // Phần 3: Trả lời ngắn
                 if(!q.options && !q.statements) {
                     if((u||"").toString().trim().replace('.',',') === q.answer.toString().replace('.',',')) {
                         recalculatedScore += 0.5;
@@ -1210,15 +1238,12 @@
             }
         });
 
-        // Xử lý làm tròn số tránh lỗi Javascript (VD: 6.999999)
         recalculatedScore = Math.round(recalculatedScore * 100) / 100;
 
-        // Nếu admin ép full điểm (7.0)
         if (window.adminForceFullScore && state.finished) {
             recalculatedScore = 7.0;
         }
 
-        // Cập nhật lại UI hiển thị kết quả dựa trên Barem 7.0
         if (state.finished) {
             document.getElementById('final-score').innerText = recalculatedScore;
             
@@ -1241,7 +1266,6 @@
             }
         }
 
-        // Bắn dữ liệu lên đám mây
         if(!wasAlreadyFinished && state.finished) {
             let timeSpent = "N/A";
             if(window.sessionStartTime) {
