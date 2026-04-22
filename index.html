@@ -258,66 +258,195 @@
 
 <script>
     const apiKey = ""; 
+    
+// =====================================================================
+// BỘ 1: NGÂN HÀNG LUYỆN TẬP (Dành cho HS Khá trở xuống - Nhận biết & Thông hiểu)
+// Cấu trúc: 40 Đa lựa chọn + 20 Đúng/Sai + 20 Trả lời ngắn
+// =====================================================================
 
-    // --- NGÂN HÀNG CÂU HỎI LUYỆN TẬP ---
-    const rawMCQ = [
-        { id: "Q1", question: "Động năng của một vật phụ thuộc vào những yếu tố nào?", options: ["Khối lượng và vận tốc.", "Khối lượng và độ cao.", "Trọng lượng và vận tốc.", "Lực tác dụng và quãng đường."], correctAnswer: "Khối lượng và vận tốc.", hint: "Năng lượng chuyển động tỉ lệ thuận với khối lượng và bình phương vận tốc.", explanation: "Động năng \\(W_d = \\frac{1}{2}mv^2\\), phụ thuộc vào khối lượng m và vận tốc v." },
-        { id: "Q2", question: "Thế năng trọng trường của một vật được tính bằng công thức nào?", options: ["\\(W_t = Ph\\)", "\\(W_t = \\frac{1}{2}mv^2\\)", "\\(W_t = Fs\\)", "\\(W_t = P/t\\)"], correctAnswer:"\\(W_t = Ph\\)", hint: "Năng lượng này phụ thuộc trực tiếp vào độ cao h so với mốc chọn làm thế năng.", explanation: "Thế năng trọng trường \\(W_t = Ph\\)" },
-        { id: "Q3", question: "Đơn vị của công cơ học trong hệ SI là gì?", options: ["Joule (J).", "Watt (W).", "Newton (N).", "Pascal (Pa)."], correctAnswer: "Joule (J).", hint: "Đơn vị này mang tên nhà vật lý James Prescott Joule, kí hiệu là chữ J.", explanation: "Đơn vị của công là Joule (J)." },
-        { id: "Q4", question: "Đại lượng nào đặc trưng cho tốc độ thực hiện công?", options: ["Công suất.", "Công cơ học.", "Cơ năng.", "Thế năng."], correctAnswer: "Công suất.", hint: "Xác định xem trong cùng 1 giây, máy nào thực hiện được nhiều công hơn.", explanation: "Công suất \\(P = A/t\\) đặc trưng cho tốc độ thực hiện công." },
-        { id: "Q5", question: "Cơ năng của một vật bao gồm những thành phần nào?", options: ["Động năng và thế năng.", "Nhiệt năng và động năng.", "Thế năng và hóa năng.", "Điện năng và cơ năng."], correctAnswer: "Động năng và thế năng.", hint: "Cơ năng là tổng các dạng năng lượng cơ học mà vật sở hữu.", explanation: "Cơ năng \\(W = W_d + W_t\\)." },
-        { id: "Q6", question: "Khi một vật rơi tự do, đại lượng nào tăng dần (bỏ qua sức cản)?", options: ["Động năng.", "Thế năng.", "Cơ năng.", "Khối lượng."], correctAnswer: "Động năng.", hint: "Khi rơi, độ cao giảm (thế năng giảm) và vận tốc tăng dần.", explanation: "Khi rơi, thế năng chuyển hóa thành động năng, làm vận tốc tăng." },
-        { id: "Q7", question: "Lực 20 N kéo vật dịch chuyển 5 m theo phương của lực. Công thực hiện là:", options: ["100 J.", "4 J.", "25 J.", "0,25 J."], correctAnswer: "100 J.", hint: "Áp dụng công thức tính công cơ bản: A = F . s", explanation: "\\(A = 20 \\cdot 5 = 100\\text{ J}.\\)" },
-        { id: "Q8", question: "Đơn vị của công suất là gì?", options: ["Watt (W).", "Joule (J).", "Newton (N).", "Mã lực (HP)."], correctAnswer: "Watt (W).", hint: "Kí hiệu đơn vị này là W, thường thấy trên các thiết bị điện tử.", explanation: "Đơn vị SI của công suất là Watt (W)." },
-        { id: "Q9", question: "Khi vật lên cao, thế năng trọng trường của nó thay đổi như thế nào?", options: ["Tăng lên.", "Giảm đi.", "Không đổi.", "Bằng không."], correctAnswer: "Tăng lên.", hint: "Thế năng trọng trường tỉ lệ thuận với độ cao h.", explanation: "Vì \\(W_t = Ph\\), h tăng thì \\(W_t\\) tăng." },
-        { id: "Q10", question: "Cơ năng được bảo toàn khi nào?", options: ["Bỏ qua ma sát và sức cản.", "Có lực ma sát tác dụng.", "Vật đứng yên.", "Vật đang nóng lên."], correctAnswer: "Bỏ qua ma sát và sức cản.", hint: "Khi không có sự hao phí năng lượng chuyển thành nhiệt năng.", explanation: "Nếu chỉ chịu tác dụng của lực phát động, cơ năng được bảo toàn." },
-        { id: "Q11", question: "Một người xách túi thực phẩm đi bộ trên đường nằm ngang, lực kéo của tay có sinh công không?", options: ["Không sinh công.", "Có sinh công dương.", "Có sinh công âm.", "Phụ thuộc vận tốc."], correctAnswer: "Không sinh công.", hint: "Lực nâng có phương thẳng đứng, vuông góc với phương dịch chuyển nằm ngang.", explanation: "Lực vuông góc với phương dịch chuyển thì không sinh công." },
-        { id: "Q12", question: "Công suất 1 kW tương ứng với bao nhiêu Watt?", options: ["1000 W.", "100 W.", "10 W.", "10000 W."], correctAnswer: "1000 W.", hint: "Kilo (k) là tiền tố có giá trị bằng một nghìn.", explanation: "1 kW = 1000 W." }
-    ];
+const rawMCQ = [
+  { id: "R_MCQ_1", question: "Năng lượng mà một vật có được do chuyển động gọi là gì?", options: ["Thế năng.", "Động năng.", "Cơ năng.", "Nhiệt năng."], correctAnswer: "Động năng.", hint: "Chuyển động tạo ra dạng năng lượng này.", explanation: "Năng lượng vật có được do chuyển động gọi là động năng." },
+  { id: "R_MCQ_2", question: "Công thức tính động năng của một vật có khối lượng m đang chuyển động với tốc độ v là", options: ["\\(W_đ = \\frac{1}{2}mv^2\\)", "\\(W_đ = mv^2\\)", "\\(W_đ = 2mv^2\\)", "\\(W_đ = \\frac{1}{2}mv\\)"], correctAnswer: "\\(W_đ = \\frac{1}{2}mv^2\\)", hint: "Công thức có chứa hệ số 1/2.", explanation: "Động năng tỉ lệ thuận với khối lượng và bình phương tốc độ của vật." },
+  { id: "R_MCQ_3", question: "Thế năng trọng trường của một vật có trọng lượng P ở độ cao h so với mốc được tính bằng công thức nào?", options: ["\\(W_t = \\frac{P}{h}\\)", "\\(W_t = P + h\\)", "\\(W_t = P \\cdot h\\)", "\\(W_t = \\frac{h}{P}\\)"], correctAnswer: "\\(W_t = P \\cdot h\\)", hint: "Thế năng là tích của trọng lượng và độ cao.", explanation: "Thế năng trọng trường bằng tích của trọng lượng và độ cao." },
+  { id: "R_MCQ_4", question: "Trong hệ SI, đơn vị của động năng, thế năng và cơ năng là", options: ["watt (W).", "newton (N).", "mét (m).", "joule (J)."], correctAnswer: "joule (J).", hint: "Mọi dạng năng lượng đều chung một đơn vị.", explanation: "Tất cả các dạng năng lượng đều có đơn vị chuẩn là joule (J)." },
+  { id: "R_MCQ_5", question: "Đơn vị của khối lượng m và tốc độ v trong hệ SI lần lượt là", options: ["gam (g) và mét trên giây (m/s).", "kilogam (kg) và mét trên giây (m/s).", "kilogam (kg) và kilomet trên giờ (km/h).", "gam (g) và centimet trên giây (cm/s)."], correctAnswer: "kilogam (kg) và mét trên giây (m/s).", hint: "Hệ SI dùng kilogam cho khối lượng.", explanation: "Đơn vị chuẩn: m tính bằng kg, v tính bằng m/s." },
+  { id: "R_MCQ_6", question: "Một vật đang nằm yên trên mặt sàn (chọn sàn làm mốc thế năng) thì động năng của vật đó bằng", options: ["giá trị cực đại.", "không.", "một nửa khối lượng.", "một nửa tốc độ."], correctAnswer: "không.", hint: "Vật nằm yên có vận tốc bằng 0.", explanation: "Khi vật nằm yên, tốc độ v = 0 nên động năng bằng không." },
+  { id: "R_MCQ_7", question: "Đại lượng nào sau đây được định nghĩa là tổng động năng và thế năng của một vật?", options: ["Cơ năng.", "Công cơ học.", "Nhiệt năng.", "Công suất."], correctAnswer: "Cơ năng.", hint: "Dạng năng lượng tổng hợp của cơ học.", explanation: "Cơ năng (W) là tổng động năng và thế năng: \\(W = W_đ + W_t\\)." },
+  { id: "R_MCQ_8", question: "Khi một vật chuyển động thẳng đều, động năng của vật đó sẽ", options: ["luôn luôn tăng.", "luôn luôn giảm.", "không thay đổi theo thời gian.", "bằng không."], correctAnswer: "không thay đổi theo thời gian.", hint: "Chuyển động thẳng đều có tốc độ không đổi.", explanation: "Trong chuyển động thẳng đều, tốc độ v không đổi nên động năng không đổi." },
+  { id: "R_MCQ_9", question: "Đại lượng h trong công thức \\(W_t = P \\cdot h\\) được gọi là", options: ["quãng đường vật đi được.", "độ cao của vật so với mốc chọn tính thế năng.", "chiều dài của vật.", "độ sâu của vật so với mặt nước."], correctAnswer: "độ cao của vật so với mốc chọn tính thế năng.", hint: "Khoảng cách theo phương thẳng đứng.", explanation: "h đặc trưng cho độ cao của vật so với một mốc thế năng được chọn." },
+  { id: "R_MCQ_10", question: "Trong hệ đo lường quốc tế (SI), đơn vị của công cơ học là", options: ["joule (J).", "watt (W).", "newton (N).", "mã lực (HP)."], correctAnswer: "joule (J).", hint: "Cùng đơn vị với năng lượng.", explanation: "Joule (J) là đơn vị đo công và năng lượng." },
+  { id: "R_MCQ_11", question: "Đơn vị nào sau đây dùng để đo công suất?", options: ["Joule (J).", "Newton (N).", "Watt (W).", "Kilojoule (kJ)."], correctAnswer: "Watt (W).", hint: "Đơn vị mang tên người phát minh ra máy hơi nước.", explanation: "Watt (W) là đơn vị của công suất." },
+  { id: "R_MCQ_12", question: "Đại lượng vật lí cho biết tốc độ thực hiện công nhanh hay chậm của một vật được gọi là", options: ["công cơ học.", "công suất.", "động năng.", "thế năng."], correctAnswer: "công suất.", hint: "Phân biệt giữa lượng công và tốc độ sinh công.", explanation: "Công suất là đại lượng đo bằng công thực hiện được trong một đơn vị thời gian." },
+  { id: "R_MCQ_13", question: "Một lực F tác dụng vào vật làm vật dịch chuyển một quãng đường s theo hướng của lực. Biểu thức tính công A là", options: ["\\(A = F \\cdot s\\)", "\\(A = \\frac{F}{s}\\)", "\\(A = \\frac{s}{F}\\)", "\\(A = F + s\\)"], correctAnswer: "\\(A = F \\cdot s\\)", hint: "Công cơ học bằng tích lực và quãng đường.", explanation: "Biểu thức tính công chuẩn là tích số của lực và quãng đường: \\(A = F \\cdot s\\)." },
+  { id: "R_MCQ_14", question: "1 mã lực (HP) xấp xỉ bằng bao nhiêu Watt?", options: ["746 W.", "100 W.", "1000 W.", "500 W."], correctAnswer: "746 W.", hint: "Đơn vị đo lường cũ của Anh.", explanation: "1 HP xấp xỉ 746 W." },
+  { id: "R_MCQ_15", question: "Đơn vị kW (Kilowatt) bằng bao nhiêu Watt?", options: ["10 W.", "100 W.", "1000 W.", "0,001 W."], correctAnswer: "1000 W.", hint: "Kilo nghĩa là nghìn.", explanation: "1 kW = 1000 W." },
+  { id: "R_MCQ_16", question: "Trong các trường hợp sau, trường hợp nào có sinh công cơ học?", options: ["Học sinh đang ngồi đọc sách.", "Người thợ đẩy tường nhưng tường không đổ.", "Con bò đang kéo xe đi trên đường.", "Quả cân nằm yên trên bàn."], correctAnswer: "Con bò đang kéo xe đi trên đường.", hint: "Phải có lực và sự dịch chuyển.", explanation: "Kéo xe chuyển động nghĩa là có lực F và quãng đường s > 0." },
+  { id: "R_MCQ_17", question: "Công thức nào sau đây dùng để tính công suất?", options: ["\\(P = A \\cdot t\\)", "\\(P = \\frac{A}{t}\\)", "\\(P = \\frac{t}{A}\\)", "\\(P = F \\cdot s\\)"], correctAnswer: "\\(P = \\frac{A}{t}\\)", hint: "Công suất bằng công chia thời gian.", explanation: "Công suất là tốc độ sinh công, \\(P = A / t\\)." },
+  { id: "R_MCQ_18", question: "Một quả bóng có khối lượng 0,5 kg đang lăn với tốc độ 2 m/s. Động năng của nó là", options: ["0,25 J.", "0,5 J.", "1,0 J.", "2,0 J."], correctAnswer: "1,0 J.", hint: "Dùng công thức \\(W_đ = \\frac{1}{2}mv^2\\).", explanation: "\\(W_đ = 0,5 \\cdot 0,5 \\cdot 2^2 = 1,0\\text{ J}.\\)" },
+  { id: "R_MCQ_19", question: "Một thùng hàng có trọng lượng 500 N ở độ cao 4 m so với mặt đất. Thế năng trọng trường là", options: ["125 J.", "504 J.", "2000 J.", "200 J."], correctAnswer: "2000 J.", hint: "Dùng công thức \\(W_t = P \\cdot h\\).", explanation: "\\(W_t = 500 \\cdot 4 = 2000\\text{ J}.\\)" },
+  { id: "R_MCQ_20", question: "Động năng của vật sẽ thay đổi như thế nào nếu tốc độ của vật tăng lên và khối lượng không đổi?", options: ["Giảm đi.", "Tăng lên.", "Không đổi.", "Bằng không."], correctAnswer: "Tăng lên.", hint: "Động năng tỉ lệ thuận với bình phương tốc độ.", explanation: "Tốc độ v tăng làm W_đ tăng." },
+  { id: "R_MCQ_21", question: "Hai vật khối lượng bằng nhau, vật 1 ở độ cao 2 m, vật 2 ở độ cao 5 m. Nhận định nào ĐÚNG?", options: ["Vật 1 có thế năng lớn hơn.", "Vật 2 có thế năng lớn hơn.", "Thế năng bằng nhau.", "Cả hai đều không có thế năng."], correctAnswer: "Vật 2 có thế năng lớn hơn.", hint: "Thế năng tỉ lệ thuận với độ cao.", explanation: "Cùng m, vật ở cao hơn có thế năng lớn hơn." },
+  { id: "R_MCQ_22", question: "Một chiếc xe tải và một xe con cùng chạy với tốc độ 50km/h. Xe nào có động năng lớn hơn?", options: ["Xe con.", "Xe tải.", "Bằng nhau.", "Không xác định được."], correctAnswer: "Xe tải.", hint: "Xe tải nặng hơn.", explanation: "Cùng tốc độ, vật có khối lượng lớn hơn sẽ có động năng lớn hơn." },
+  { id: "R_MCQ_23", question: "Thế năng trọng trường KHÔNG phụ thuộc vào yếu tố nào?", options: ["Khối lượng.", "Độ cao.", "Tốc độ.", "Trọng lượng."], correctAnswer: "Tốc độ.", hint: "Thế năng là năng lượng tĩnh.", explanation: "Thế năng chỉ phụ thuộc P và h, không phụ thuộc v." },
+  { id: "R_MCQ_24", question: "Một vật được thả rơi từ trên cao, độ cao của vật giảm dần nên thế năng của vật sẽ", options: ["Tăng dần.", "Giảm dần.", "Không đổi.", "Bằng không."], correctAnswer: "Giảm dần.", hint: "h giảm thì thế năng giảm.", explanation: "Thế năng tỉ lệ thuận với độ cao h." },
+  { id: "R_MCQ_25", question: "Một người đẩy xe đi được 20 m với lực đẩy 100 N theo phương chuyển động. Công thực hiện là", options: ["5 J.", "120 J.", "80 J.", "2000 J."], correctAnswer: "2000 J.", hint: "A = F * s", explanation: "\\(A = 100 \\cdot 20 = 2000\\text{ J}.\\)" },
+  { id: "R_MCQ_26", question: "Để thực hiện một công 600 J bằng lực 30 N, vật phải dịch chuyển quãng đường là", options: ["18000 m.", "20 m.", "0,05 m.", "630 m."], correctAnswer: "20 m.", hint: "s = A / F", explanation: "\\(s = \\frac{600}{30} = 20\\text{ m}.\\)" },
+  { id: "R_MCQ_27", question: "Một động cơ thực hiện công 12000 J trong 120 giây. Công suất là", options: ["100 W.", "6000 W.", "24000 W.", "100 J."], correctAnswer: "100 W.", hint: "P = A / t", explanation: "\\(P = 12000 / 120 = 100\\text{ W}.\\)" },
+  { id: "R_MCQ_28", question: "Máy kéo có công suất 5000 W. Trong 10 giây, máy sinh công là", options: ["50 J.", "500 J.", "50000 J.", "0,5 J."], correctAnswer: "50000 J.", hint: "A = P * t", explanation: "\\(A = 5000 \\cdot 10 = 50000\\text{ J}.\\)" },
+  { id: "R_MCQ_29", question: "Khi một quả mít rơi từ trên cây xuống, trong quá trình rơi thế năng của quả mít", options: ["giảm dần.", "tăng dần.", "không đổi.", "bằng không."], correctAnswer: "giảm dần.", hint: "Khoảng cách tới mặt đất đang thay đổi thế nào?", explanation: "Rơi xuống nghĩa là h giảm, W_t giảm." },
+  { id: "R_MCQ_30", question: "Một vật nặng 2kg chuyển động với tốc độ 4m/s. Động năng của vật là", options: ["4 J", "8 J", "16 J", "32 J"], correctAnswer: "16 J", hint: "W_đ = 0.5*m*v^2", explanation: "\\(W_đ = 0.5 \\cdot 2 \\cdot 4^2 = 16\\text{ J}.\\)" },
+  { id: "R_MCQ_31", question: "Một người nâng vật 50N lên cao 2m. Công thực hiện là", options: ["25 J", "100 J", "52 J", "48 J"], correctAnswer: "100 J", hint: "A = P*h", explanation: "\\(A = 50 \\cdot 2 = 100\\text{ J}.\\)" },
+  { id: "R_MCQ_32", question: "Một chiếc máy bay đang bay ngang thả bớt hàng hóa, thế năng trọng trường của nó sẽ", options: ["Tăng lên.", "Giảm xuống.", "Không đổi.", "Bằng không."], correctAnswer: "Giảm xuống.", hint: "Khối lượng máy bay thay đổi.", explanation: "Thả hàng làm giảm m, nên W_t giảm." },
+  { id: "R_MCQ_33", question: "Một máy bơm có công suất 1000 W hoạt động trong 5 giây sinh ra một công là", options: ["5000 J", "200 J", "1000 J", "5 J"], correctAnswer: "5000 J", hint: "A = P*t", explanation: "\\(A = 1000 \\cdot 5 = 5000\\text{ J}.\\)" },
+  { id: "R_MCQ_34", question: "Một viên bi 0,1 kg lăn trên sàn với tốc độ 10 m/s. Động năng là", options: ["0,5 J", "5 J", "10 J", "1 J"], correctAnswer: "5 J", hint: "W_đ = 0.5*m*v^2", explanation: "\\(W_đ = 0.5 \\cdot 0.1 \\cdot 100 = 5\\text{ J}.\\)" },
+  { id: "R_MCQ_35", question: "Yếu tố nào làm động năng của một vật ĐANG chuyển động tăng lên?", options: ["Giảm khối lượng.", "Tăng tốc độ.", "Nâng vật lên cao.", "Giảm tốc độ."], correctAnswer: "Tăng tốc độ.", hint: "Động năng phụ thuộc tốc độ.", explanation: "Vận tốc v tăng thì W_đ tăng." },
+  { id: "R_MCQ_36", question: "Một thiết bị có ghi 100W. Con số này có ý nghĩa gì?", options: ["Thiết bị thực hiện công 100J trong 1 giờ.", "Thiết bị thực hiện công 100J trong 1 giây.", "Thiết bị có lực 100N.", "Thiết bị đi được 100m."], correctAnswer: "Thiết bị thực hiện công 100J trong 1 giây.", hint: "1W = 1J/s", explanation: "Công suất 100W nghĩa là sinh công 100J/s." },
+  { id: "R_MCQ_37", question: "Động năng của một vật bằng 0 khi nào?", options: ["Khi vật đứng yên.", "Khi vật ở dưới đất.", "Khi vật chuyển động đều.", "Khi vật rơi tự do."], correctAnswer: "Khi vật đứng yên.", hint: "Vận tốc bằng 0.", explanation: "Đứng yên thì v=0 nên W_đ=0." },
+  { id: "R_MCQ_38", question: "Thế năng trọng trường của một vật bằng 0 khi nào?", options: ["Khi vật rơi.", "Khi vật nằm đúng tại vị trí mốc.", "Khi vật bay ngang.", "Khi vật đứng yên trên cao."], correctAnswer: "Khi vật nằm đúng tại vị trí mốc.", hint: "h = 0.", explanation: "Tại mốc thế năng, h=0 nên W_t=0." },
+  { id: "R_MCQ_39", question: "Nếu lực kéo bằng 0 thì công của lực đó bằng bao nhiêu?", options: ["Phụ thuộc quãng đường.", "Bằng 0 J.", "Vô hạn.", "Không xác định."], correctAnswer: "Bằng 0 J.", hint: "A = F*s", explanation: "F = 0 thì A = 0." },
+  { id: "R_MCQ_40", question: "Một người có công suất 150 W thực hiện công 4500 J trong thời gian", options: ["30 s", "15 s", "45 s", "10 s"], correctAnswer: "30 s", hint: "t = A / P", explanation: "\\(t = 4500 / 150 = 30\\text{ s}.\\)" }
+];
 
-    const rawTF = [
-        { id: "TF1", context: "Xét một quả bóng được ném thẳng đứng lên cao (bỏ qua sức cản không khí).", statements: ["a) Trong quá trình bóng đi lên, động năng giảm dần.", "b) Tại vị trí cao nhất, cơ năng của bóng bằng 0.", "c) Thế năng trọng trường đạt giá trị lớn nhất tại điểm cao nhất.", "d) Động năng chuyển hóa thành thế năng khi bóng đi lên."], correctPattern: [true, false, true, true], hint: "Độ cao tăng làm thế năng tăng; vận tốc giảm làm động năng giảm.", explanation: "b Sai vì tại điểm cao nhất cơ năng được bảo toàn và bằng thế năng cực đại." },
-        { id: "TF2", context: "Về các đơn vị và công thức tính Công và Công suất.", statements: ["a) Công suất cho biết công thực hiện trong 1 giây.", "b) Một máy có công suất lớn thì thực hiện công nhanh hơn.", "c) 1 Joule trên giây (J/s) bằng 1 Watt (W).", "d) Công cơ học chỉ xuất hiện khi có lực làm vật dịch chuyển."], correctPattern: [true, true, true, true], hint: "Hãy nhớ định nghĩa P = A/t và điều kiện để có công cơ học.", explanation: "Tất cả các ý đều đúng theo lý thuyết Vật lý 9." },
-        { id: "TF3", context: "Sự chuyển hóa năng lượng của con lắc đơn.", statements: ["a) Ở vị trí thấp nhất, động năng đạt cực đại.", "b) Ở vị trí biên (cao nhất), thế năng đạt cực đại.", "c) Cơ năng giảm dần do ma sát với không khí (thực tế).", "d) Động năng tỉ lệ thuận với độ cao của con lắc."], correctPattern: [true, true, true, false], hint: "Vận tốc lớn nhất ở đáy, độ cao lớn nhất ở biên.", explanation: "d Sai vì khi độ cao tăng thì động năng giảm (chuyển hóa thành thế năng)." },
-        { id: "TF4", context: "Công cơ học trong đời sống thực tế.", statements: ["a) Vận động viên giữ tạ đứng yên trên cao có sinh công cơ học.", "b) Máy xúc nâng khối đá lên cao có sinh công cơ học.", "c) Lực ma sát sinh công làm hao mòn lốp xe.", "d) Lực càng lớn và quãng đường càng dài thì công càng lớn."], correctPattern: [false, true, true, true], hint: "Công cơ học yêu cầu phải có cả lực và sự dịch chuyển quãng đường s > 0.", explanation: "a Sai vì vật đứng yên (s = 0) nên công thực hiện bằng 0." }
-    ];
+const rawTF = [
+  { id: "R_TF_1", context: "Một vật có khối lượng 4 kg đang chuyển động trên mặt sàn nằm ngang với tốc độ không đổi 3 m/s. Chọn mặt sàn làm mốc thế năng.", statements: ["a) Động năng của vật có giá trị là 18 J.", "b) Vì vật chuyển động trên mặt sàn nên cơ năng của vật luôn bằng không.", "c) Nếu tốc độ của vật tăng lên thì động năng sẽ tăng.", "d) Công thức tính động năng của vật là \\(W_đ = mv^2\\)."], correctPattern: [true, false, true, false], hint: "Nhớ công thức cơ năng và động năng chuẩn.", explanation: "a) Đúng (0.5*4*9=18). b) Sai (có động năng nên W>0). c) Đúng. d) Sai (thiếu 1/2)." },
+  { id: "R_TF_2", context: "Một quả dừa có trọng lượng 15 N đang ở trên cây cách mặt đất 6 m.", statements: ["a) Đơn vị của thế năng trọng trường là joule (J).", "b) Thế năng trọng trường của quả dừa so với mặt đất là 90 J.", "c) Nếu quả dừa rơi chạm đất và nằm yên, thế năng của nó so với mặt đất vẫn bằng 90 J.", "d) Công thức tính thế năng là \\(W_t = P \\cdot h\\)."], correctPattern: [true, true, false, true], hint: "Chạm đất thì độ cao h=0.", explanation: "c) Sai vì khi chạm đất h=0 nên W_t=0." },
+  { id: "R_TF_3", context: "Xét các đặc điểm của công cơ học và công suất.", statements: ["a) Đơn vị của công có thể viết là N.m.", "b) Công tỉ lệ thuận với quãng đường dịch chuyển (khi lực không đổi).", "c) Watt (W) là đơn vị dùng để đo công.", "d) Công suất tính bằng công thức \\(P = A/t\\)."], correctPattern: [true, true, false, true], hint: "Watt đo công suất.", explanation: "c) Sai vì Watt là đơn vị công suất, Joule mới đo công." },
+  { id: "R_TF_4", context: "Một người đang đứng yên vác một bao xi măng nặng 50kg trên vai trong 5 phút.", statements: ["a) Người đó đã thực hiện một công cơ học rất lớn.", "b) Trọng lượng bao xi măng là 500 N.", "c) Quãng đường dịch chuyển của bao xi măng bằng 0.", "d) Công suất của người đó bằng 0."], correctPattern: [false, true, true, true], hint: "Không có sự dịch chuyển thì không có công.", explanation: "a) Sai vì quãng đường bằng 0 nên công A=0." },
+  { id: "R_TF_5", context: "Một động cơ điện có công suất 2000 W (2 kW) hoạt động trong 10 giây.", statements: ["a) Trong 1 giây, động cơ sinh công 2000 J.", "b) Trong 10 giây, động cơ sinh công 20000 J.", "c) 2 kW bằng 2000 W.", "d) Nếu chạy trong 20 giây, công suất của động cơ sẽ tăng lên 4000 W."], correctPattern: [true, true, true, false], hint: "Công suất định mức của máy không phụ thuộc thời gian chạy.", explanation: "d) Sai vì công suất thiết bị là hằng số (2000W), chỉ có công sinh ra mới tăng lên." },
+  { id: "R_TF_6", context: "Hai bạn An và Bình cùng chạy bộ. An nặng 50 kg chạy 2 m/s. Bình nặng 40 kg chạy 3 m/s.", statements: ["a) Động năng của bạn An là 100 J.", "b) Động năng của bạn Bình là 180 J.", "c) An có động năng lớn hơn Bình vì An nặng hơn.", "d) Động năng tỉ lệ thuận với bình phương vận tốc."], correctPattern: [true, true, false, true], hint: "Tính cẩn thận W_đ từng người.", explanation: "c) Sai vì Bình (180J) có động năng lớn hơn An (100J)." },
+  { id: "R_TF_7", context: "Một con lắc đang dao động qua lại quanh vị trí cân bằng (thấp nhất).", statements: ["a) Tại vị trí cao nhất, tốc độ bằng 0 nên động năng bằng 0.", "b) Tại vị trí thấp nhất, độ cao bằng 0 nên thế năng bằng 0.", "c) Cơ năng là tổng động năng và thế năng.", "d) Động năng luôn không đổi trong suốt quá trình."], correctPattern: [true, true, true, false], hint: "Tốc độ thay đổi liên tục.", explanation: "d) Sai vì vận tốc thay đổi liên tục khiến động năng thay đổi." },
+  { id: "R_TF_8", context: "Một vật 2kg thả rơi tự do. Lấy g=10m/s2.", statements: ["a) Trọng lượng của vật là 20 N.", "b) Khi rơi, độ cao giảm nên thế năng giảm.", "c) Khi rơi, tốc độ tăng nên động năng tăng.", "d) Khi rơi, cơ năng của vật giảm liên tục."], correctPattern: [true, true, true, false], hint: "Rơi tự do bảo toàn năng lượng.", explanation: "d) Sai vì bỏ qua lực cản thì cơ năng bảo toàn (không đổi)." },
+  { id: "R_TF_9", context: "Một xe tải 2000kg và một xe con 1000kg cùng chạy tốc độ 10m/s.", statements: ["a) Động năng xe tải là 100.000 J.", "b) Động năng xe con là 50.000 J.", "c) Xe tải có động năng gấp đôi xe con.", "d) Cả hai xe đều không có thế năng nếu đi trên đường ngang mốc mặt đường."], correctPattern: [true, true, true, true], hint: "M tính bằng kg, v tính bằng m/s.", explanation: "Cả 4 nhận định đều đúng với công thức tính trực tiếp." },
+  { id: "R_TF_10", context: "Trên nhãn quạt máy ghi 60W.", statements: ["a) Số 60W cho biết công suất điện của quạt.", "b) 60W nghĩa là quạt tiêu thụ 60 J trong 1 giờ.", "c) Quạt chạy 1 giây tốn năng lượng 60 J.", "d) W (Watt) là đơn vị chung của năng lượng."], correctPattern: [true, false, true, false], hint: "Watt là J/s.", explanation: "b) Sai (trong 1 giây). d) Sai (Watt đo công suất, Joule mới đo năng lượng)." },
+  { id: "R_TF_11", context: "Nước chảy trên dòng sông thẳng trên mặt bằng.", statements: ["a) Dòng nước đang chuyển động nên có động năng.", "b) Nếu nước chảy xiết (nhanh hơn) thì động năng tăng.", "c) Do dòng sông chảy ngang, thế năng thay đổi liên tục.", "d) Động năng của nước có thể dùng để đẩy thuyền."], correctPattern: [true, true, false, true], hint: "Đường ngang thì độ cao không đổi.", explanation: "c) Sai vì độ cao không đổi nên thế năng không đổi." },
+  { id: "R_TF_12", context: "Người lực sĩ nâng tạ 1000 N lên 2 m trong 2 giây.", statements: ["a) Lực nâng của tay ít nhất bằng 1000 N.", "b) Công của lực nâng là 2000 J.", "c) Công suất của người lực sĩ là 1000 W.", "d) Nếu nâng tạ trong 4 giây thì công suất vẫn là 1000 W."], correctPattern: [true, true, true, false], hint: "P = A/t", explanation: "d) Sai vì P = 2000/4 = 500 W." },
+  { id: "R_TF_13", context: "Máy kéo A sinh công 10000 J trong 10s. Máy kéo B sinh công 15000 J trong 15s.", statements: ["a) Máy A có công suất 1000 W.", "b) Máy B có công suất 1000 W.", "c) Hai máy thực hiện công nhanh như nhau.", "d) Máy B thực hiện được nhiều công hơn trong cùng một thời gian."], correctPattern: [true, true, true, false], hint: "Tính công suất cả hai máy.", explanation: "d) Sai vì công suất bằng nhau, tốc độ sinh công (khả năng thực hiện công trong cùng thời gian) là như nhau." },
+  { id: "R_TF_14", context: "Một viên bi sắt khối lượng 100g đặt trên bàn cao 1m.", statements: ["a) Đổi khối lượng ra là 0,1 kg.", "b) Trọng lượng viên bi là 1 N (lấy g=10).", "c) Thế năng trọng trường là 1 J.", "d) Viên bi đang đứng yên nên động năng là 1 J."], correctPattern: [true, true, true, false], hint: "Đứng yên thì v=0.", explanation: "d) Sai vì đứng yên v=0 -> W_đ = 0." },
+  { id: "R_TF_15", context: "Công cơ học được thực hiện khi con ngựa kéo xe.", statements: ["a) Con ngựa tác dụng lực kéo lên xe.", "b) Lực kéo làm xe dịch chuyển.", "c) Công của con ngựa là A = F.s.", "d) Nếu ngựa đứng yên mà vẫn gồng mình kéo xe, nó vẫn sinh công cơ học."], correctPattern: [true, true, true, false], hint: "s = 0 thì A = 0.", explanation: "d) Sai vì xe không dịch chuyển (s=0) thì công cơ học bằng 0." },
+  { id: "R_TF_16", context: "Khi máy bay đang lấy độ cao để cất cánh thẳng lên.", statements: ["a) Máy bay đang bay lên nên độ cao tăng, thế năng tăng.", "b) Máy bay có vận tốc nên nó có động năng.", "c) Cơ năng của máy bay là tổng động năng và thế năng.", "d) Vì thế năng tăng nên bắt buộc động năng phải giảm."], correctPattern: [true, true, true, false], hint: "Động cơ máy bay đang hoạt động.", explanation: "d) Sai vì động cơ máy bay sinh công bơm thêm năng lượng cho hệ, động năng có thể tăng hoặc không đổi." },
+  { id: "R_TF_17", context: "Thả một vật rơi từ đỉnh tòa nhà.", statements: ["a) Lúc bắt đầu thả (v=0), động năng bằng 0.", "b) Trong lúc rơi, khoảng cách tới mặt đất giảm.", "c) Thế năng của vật luôn không đổi.", "d) Tốc độ tăng làm động năng tăng."], correctPattern: [true, true, false, true], hint: "Độ cao thay đổi.", explanation: "c) Sai vì khoảng cách (độ cao h) giảm nên thế năng giảm." },
+  { id: "R_TF_18", context: "Một người đạp xe trên đường ngang dài 50m với lực đạp 100N.", statements: ["a) Công của lực đạp là 5000 J.", "b) Nếu đường không có ma sát, xe sẽ chuyển động nhanh dần.", "c) Công suất của người đạp phụ thuộc thời gian đi hết 50m.", "d) Nếu đi hết 50m trong 10s, công suất là 50 W."], correctPattern: [true, true, true, false], hint: "Tính P = A/t.", explanation: "d) Sai vì P = 5000/10 = 500 W." },
+  { id: "R_TF_19", context: "Các loại năng lượng và đơn vị đo.", statements: ["a) Động năng đo bằng Joule.", "b) Thế năng đo bằng Joule.", "c) Công suất đo bằng Joule.", "d) Cơ năng đo bằng Joule."], correctPattern: [true, true, false, true], hint: "Công suất có đơn vị riêng.", explanation: "c) Sai vì Công suất đo bằng Watt." },
+  { id: "R_TF_20", context: "Năng lượng gió làm quay chong chóng.", statements: ["a) Gió là không khí chuyển động nên có động năng.", "b) Động năng của gió đã truyền một phần sang chong chóng.", "c) Nếu gió thổi mạnh hơn (vận tốc lớn), động năng gió lớn hơn.", "d) Gió không có khối lượng nên không có động năng."], correctPattern: [true, true, true, false], hint: "Không khí có khối lượng.", explanation: "d) Sai vì không khí cấu tạo từ vật chất, có khối lượng." }
+];
 
-    const rawShort = [
-        { id: "SA1", question: "Tính công thực hiện khi lực 50 N đẩy xe đi được 10 m theo phương của lực (J).", answer: "500", hint: "Tính theo tích số: A = F . s", explanation: "\\(A = 50 \\cdot 10 = 500\\text{ J}.\\)" },
-        { id: "SA2", question: "Một máy thực hiện công 3000 J trong 1 phút. Tính công suất của máy (W).", answer: "50", hint: "Công suất P = A / t. Lưu ý đổi 1 phút = 60 giây.", explanation: "\\(P = 3000 / 60 = 50\\text{ W}.\\)" },
-        { id: "SA3", question: "Vật khối lượng 2 kg đang chạy with vận tốc 4 m/s. Tính động năng (J).", answer: "16", hint: "Động năng bằng 1/2 nhân khối lượng nhân bình phương vận tốc.", explanation: "\\(W_d = 0,5 \\cdot 2 \\cdot 4^2 = 16\\text{ J}.\\)" },
-        { id: "SA4", question: "Vật nặng 1 kg ở độ cao 5 m. Lấy g = 10 m/s². Tính thế năng trọng trường (J).", answer: "50", hint: "Thế năng trọng trường Wt = m . g . h", explanation: "\\(W_t = 1 \\cdot 10 \\cdot 5 = 50\\text{ J}.\\)" }
-    ];
+const rawShort = [
+  { id: "R_SA_1", question: "Một vật có khối lượng 2 kg đang chuyển động với tốc độ 6 m/s. Tính động năng của vật đó theo đơn vị joule.", answer: "36", hint: "Áp dụng công thức \\(W_đ = 0.5mv^2\\).", explanation: "\\(W_đ = 0,5 \\cdot 2 \\cdot 6^2 = 36\\text{ J}.\\)" },
+  { id: "R_SA_2", question: "Một chậu cây có trọng lượng 45 N được đặt trên ban công cao 8 m so với mặt đất. Tính thế năng trọng trường của chậu cây so với mặt đất theo đơn vị joule.", answer: "360", hint: "Áp dụng công thức \\(W_t = P \\cdot h\\).", explanation: "\\(W_t = 45 \\cdot 8 = 360\\text{ J}.\\)" },
+  { id: "R_SA_3", question: "Cho các nhận định:<br/>(1) Động năng là năng lượng do chuyển động.<br/>(2) Vật nặng luôn có động năng lớn hơn vật nhẹ.<br/>(3) Động năng đứng yên bằng không.<br/>(4) Đơn vị động năng là Watt.<br/>(5) Tốc độ tăng làm động năng tăng.<br/>Ghi chuỗi số các nhận định ĐÚNG tăng dần.", answer: "135", hint: "Tìm định nghĩa chuẩn.", explanation: "Ý 2 sai (thiếu điều kiện v), Ý 4 sai (đơn vị J). Các ý đúng là 1, 3, 5." },
+  { id: "R_SA_4", question: "Một lực đẩy 50N làm xe dịch chuyển 12m. Tính công thực hiện (J).", answer: "600", hint: "A = F * s", explanation: "\\(A = 50 \\cdot 12 = 600\\text{ J}.\\)" },
+  { id: "R_SA_5", question: "Một máy thực hiện công 4500 J trong 15 s. Tính công suất (W).", answer: "300", hint: "P = A / t", explanation: "\\(P = 4500 / 15 = 300\\text{ W}.\\)" },
+  { id: "R_SA_6", question: "Động năng của quả cầu 0,5kg chuyển động 4m/s là bao nhiêu J?", answer: "4", hint: "0.5 * 0.5 * 16", explanation: "\\(W_đ = 0,5 \\cdot 0,5 \\cdot 4^2 = 4\\text{ J}.\\)" },
+  { id: "R_SA_7", question: "Thế năng của vật 150N ở độ cao 2m là bao nhiêu J?", answer: "300", hint: "Nhân P với h.", explanation: "\\(W_t = 150 \\cdot 2 = 300\\text{ J}.\\)" },
+  { id: "R_SA_8", question: "Cho các nhận định:<br/>(1) Thế năng phụ thuộc độ cao.<br/>(2) Tại mặt đất h=0 thế năng bằng 0.<br/>(3) Đơn vị thế năng là J.<br/>(4) Công thức Wt = P/h.<br/>(5) Thế năng là dạng năng lượng tĩnh.<br/>Ghi chuỗi số nhận định ĐÚNG.", answer: "1235", hint: "Công thức thế năng là tích.", explanation: "Ý 4 sai vì công thức là P*h. Các ý đúng 1, 2, 3, 5." },
+  { id: "R_SA_9", question: "Một vật có động năng 25 J và thế năng 45 J. Tính cơ năng (J).", answer: "70", hint: "Cộng lại.", explanation: "\\(W = 25 + 45 = 70\\text{ J}.\\)" },
+  { id: "R_SA_10", question: "Để thực hiện công 2400J bằng lực 80N, vật phải đi bao nhiêu m?", answer: "30", hint: "s = A / F", explanation: "\\(s = 2400 / 80 = 30\\text{ m}.\\)" },
+  { id: "R_SA_11", question: "Máy bơm 2000W hoạt động, sinh công 10000J. Thời gian chạy là bao nhiêu s?", answer: "5", hint: "t = A / P", explanation: "\\(t = 10000 / 2000 = 5\\text{ s}.\\)" },
+  { id: "R_SA_12", question: "Vật rơi từ trên cao xuống, động năng lúc chạm đất là 100J. Nếu bỏ qua cản trở, thế năng ban đầu là bao nhiêu J?", answer: "100", hint: "Bảo toàn cơ năng.", explanation: "Toàn bộ W_t chuyển thành W_đ, nên W_t ban đầu = 100 J." },
+  { id: "R_SA_13", question: "Khối lượng vật là 10kg, vận tốc là 3m/s. Tính động năng (J).", answer: "45", hint: "0.5 * 10 * 9", explanation: "\\(W_đ = 0,5 \\cdot 10 \\cdot 3^2 = 45\\text{ J}.\\)" },
+  { id: "R_SA_14", question: "Công suất là 500W, thời gian 10s. Tính công thực hiện (J).", answer: "5000", hint: "A = P * t", explanation: "\\(A = 500 \\cdot 10 = 5000\\text{ J}.\\)" },
+  { id: "R_SA_15", question: "Một người kéo tạ 400N lên cao 3m. Tính công (J).", answer: "1200", hint: "A = P * h", explanation: "\\(A = 400 \\cdot 3 = 1200\\text{ J}.\\)" },
+  { id: "R_SA_16", question: "Cho các nhận định về công suất:<br/>(1) Tính bằng A/t.<br/>(2) Đơn vị là Watt.<br/>(3) P càng lớn làm việc càng nhanh.<br/>(4) Bằng lực nhân quãng đường.<br/>Ghi chuỗi số nhận định ĐÚNG.", answer: "123", hint: "Ý 4 là định nghĩa của công.", explanation: "Các ý 1, 2, 3 đúng. Ý 4 là định nghĩa công cơ học." },
+  { id: "R_SA_17", question: "Một người có trọng lượng 500 N đứng yên trên sân thượng cao 10m. Công cơ học sinh ra là bao nhiêu J?", answer: "0", hint: "Đứng yên s = 0.", explanation: "Vì không có sự dịch chuyển nên A = 0." },
+  { id: "R_SA_18", question: "Thế năng trọng trường của viên bi 2N ở trên lầu cao 5m là bao nhiêu J?", answer: "10", hint: "P * h", explanation: "\\(W_t = 2 \\cdot 5 = 10\\text{ J}.\\)" },
+  { id: "R_SA_19", question: "Cơ năng của vật rơi tự do là 80J. Tại vị trí vật có thế năng 30J thì động năng là bao nhiêu J?", answer: "50", hint: "W = W_đ + W_t", explanation: "\\(W_đ = W - W_t = 80 - 30 = 50\\text{ J}.\\)" },
+  { id: "R_SA_20", question: "1 mã lực (HP) xấp xỉ bằng bao nhiêu Watt (ghi số nguyên)?", answer: "746", hint: "Con số quy ước.", explanation: "1 HP = 746 W." }
+];
 
-    // --- NGÂN HÀNG CÂU HỎI KIỂM TRA ---
-    const examMCQ = [
-        { id: "EQ1", question: "Vật m = 2 kg rơi từ độ cao 10 m. Bỏ qua sức cản (lấy g = 10). Động năng khi chạm đất là bao nhiêu?", options: ["200 J.", "100 J.", "20 J.", "0 J."], correctAnswer: "200 J.", explanation: "Bảo toàn cơ năng: Động năng cực đại khi chạm đất bằng thế năng cực đại: \\(W_d = Ph = 2 \\cdot 10 \\cdot 10 = 200\\text{ J}.\\)" },
-        { id: "EQ2", question: "Một ôtô có công suất 50 kW chuyển động đều với vận tốc 72 km/h. Lực kéo của động cơ là", options: ["2500 N.", "5000 N.", "694 N.", "3600 N."], correctAnswer: "2500 N.", explanation: "\\(v = 72\\text{ km/h} = 20\\text{ m/s}\\). Ta có \\(P = F \\cdot v \\Rightarrow F = P/v = 50000 / 20 = 2500\\text{ N}.\\)" },
-        { id: "EQ3", question: "Ném vật m = 500g thẳng đứng lên cao với vận tốc 10 m/s (g = 10). Độ cao cực đại vật đạt được là:", options: ["5 m.", "10 m.", "2,5 m.", "20 m."], correctAnswer: "5 m.", explanation: "Bảo toàn cơ năng: \\(\\frac{1}{2}mv^2 = Ph \\Rightarrow h = \\frac{v^2}{2g} = \\frac{100}{20} = 5\\text{ m}.\\)" },
-        { id: "EQ4", question: "Nếu vận tốc của một vật tăng lên 2 lần và khối lượng của nó giảm đi một nửa thì động năng của vật sẽ:", options: ["Tăng 2 lần.", "Không đổi.", "Tăng 4 lần.", "Giảm 2 lần."], correctAnswer: "Tăng 2 lần.", explanation: "Khối lượng m' = m/2, v' = 2v. Khi đó \\(W_d' = \\frac{1}{2} (m/2) (2v)^2 = 2 \\cdot (\\frac{1}{2}mv^2) = 2 W_d\\)." },
-        { id: "EQ5", question: "Một thác nước cao 30 m, mỗi giây đổ xuống 10 m³ nước (khối lượng riêng 1000 kg/m³, g=10). Công suất của thác nước là:", options: ["3 MW.", "300 kW.", "30 kW.", "3 W."], correctAnswer: "3 MW.", explanation: "Khối lượng \\(m = 10 \\cdot 1000 = 10000\\text{ kg}\\). Công suất \\(P = \\frac{Ph}{t} = \\frac{10000 \\cdot 10 \\cdot 30}{1} = 3000000\\text{ W} = 3\\text{ MW}.\\)" },
-        { id: "EQ6", question: "Tại vị trí động năng bằng 3 lần thế năng, một vật được ném thẳng đứng lên cao có độ cao bằng bao nhiêu phần độ cao cực đại?", options: ["1/4.", "1/3.", "1/2.", "3/4."], correctAnswer: "1/4.", explanation: "Cơ năng \\(W = W_d + W_t = 3W_t + W_t = 4W_t\\). Do \\(W = Ph_{max}\\) và \\(W_t = Ph\\) nên \\(Ph_{max} = 4Ph \\Rightarrow h = h_{max}/4\\)." },
-        { id: "EQ7", question: "Một cần cẩu nâng vật nặng 1 tấn lên cao 5 m trong 10 s. Biết hiệu suất của động cơ là 80% (g=10). Công suất toàn phần của động cơ là:", options: ["6250 W.", "5000 W.", "4000 W.", "10000 W."], correctAnswer: "6250 W.", explanation: "Công có ích: \\(A_i = Ph = 1000 \\cdot 10 \\cdot 5 = 50000\\text{ J}\\). Công suất có ích \\(P_i = 5000\\text{ W}\\). Công suất toàn phần \\(P_{tp} = P_i / 0,8 = 6250\\text{ W}.\\)" },
-        { id: "EQ8", question: "Công của lực phanh làm một ôtô khối lượng 1 tấn giảm vận tốc từ 20 m/s xuống còn 10 m/s là:", options: ["-150 kJ.", "150 kJ.", "-50 kJ.", "50 kJ."], correctAnswer: "-150 kJ.", explanation: "Độ biến thiên động năng: \\(A = \\Delta W_d = \\frac{1}{2}m(v_2^2 - v_1^2) = 0,5 \\cdot 1000 \\cdot (100 - 400) = -150000\\text{ J} = -150\\text{ kJ}.\\)" },
-        { id: "EQ9", question: "Một quả bóng khối lượng 200g rơi từ độ cao 5m xuống đất và nảy lên đến độ cao 3m (g=10). Phần cơ năng đã chuyển hóa thành nhiệt năng là:", options: ["4 J.", "6 J.", "10 J.", "16 J."], correctAnswer: "4 J.", explanation: "Cơ năng hao phí: \\(\\Delta W = W_{t1} - W_{t2} = Ph_1 - Ph_2 = 0,2 \\cdot 10 \\cdot (5 - 3) = 4\\text{ J}.\\)" },
-        { id: "EQ10", question: "Động cơ điện có công suất 2 kW dùng để kéo một vật nặng 100 kg lên cao đều (g=10). Vận tốc kéo vật là:", options: ["2 m/s.", "20 m/s.", "0,2 m/s.", "5 m/s."], correctAnswer: "2 m/s.", explanation: "\\(P = F \\cdot v = mg \\cdot v \\Rightarrow v = \\frac{P}{mg} = \\frac{2000}{100 \\cdot 10} = 2\\text{ m/s}.\\)" },
-        { id: "EQ11", question: "Hai vật có cùng khối lượng. Vật 1 trượt trên dốc nghiêng không ma sát, vật 2 rơi tự do từ cùng một độ cao. So sánh động năng của hai vật khi chạm đất:", options: ["Bằng nhau.", "Vật 1 lớn hơn.", "Vật 2 lớn hơn.", "Không đủ dữ kiện."], correctAnswer: "Bằng nhau.", explanation: "Theo định luật bảo toàn cơ năng, vì xuất phát từ cùng một độ cao (cùng thế năng) và không có ma sát nên động năng khi chạm đất phải bằng nhau." },
-        { id: "EQ12", question: "Dùng mặt phẳng nghiêng dài 4 m để kéo vật nặng 50 kg lên cao 1 m. Nếu lực kéo là 150 N thì độ lớn lực ma sát là bao nhiêu? (Lấy g=10)", options: ["25 N.", "125 N.", "50 N.", "100 N."], correctAnswer: "25 N.", explanation: "Công có ích \\(A_i = 50 \\cdot 10 \\cdot 1 = 500\\text{ J}\\). Công toàn phần \\(A_{tp} = F \\cdot s = 150 \\cdot 4 = 600\\text{ J}\\). Công ma sát \\(A_{ms} = 600 - 500 = 100\\text{ J}\\). Suy ra \\(F_{ms} = \\frac{100}{4} = 25\\text{ N}.\\)" }
-    ];
 
-    const examTF = [
-        { id: "ETF1", context: "Một vật trượt có ma sát từ đỉnh dốc xuống chân mặt phẳng nghiêng.", statements: ["a) Cơ năng của vật được bảo toàn trong suốt quá trình.", "b) Độ giảm thế năng bằng tổng độ tăng động năng và công của lực ma sát.", "c) Động năng của vật tại chân dốc luôn bằng thế năng tại đỉnh dốc.", "d) Công của trọng lực tác dụng lên vật là một đại lượng dương."], correctPattern: [false, true, false, true], explanation: "a Sai vì có ma sát nên cơ năng không bảo toàn. c Sai vì động năng sẽ nhỏ hơn thế năng ban đầu do mất mát năng lượng." },
-        { id: "ETF2", context: "Một thang máy kéo khối lượng 500 kg đi lên đều with vận tốc 2 m/s (g=10).", statements: ["a) Lực kéo của động cơ thang máy phải lớn hơn trọng lượng buồng thang.", "b) Công suất của động cơ thang máy là 10 kW.", "c) Trong 5 giây, động cơ thang máy thực hiện được công là 50000 J.", "d) Nếu thang máy đi lên nhanh dần, lực kéo của động cơ sẽ nhỏ hơn trọng lượng."], correctPattern: [false, true, true, false], explanation: "a Sai vì chuyển động đều nên lực kéo bằng trọng lượng. b Đúng vì \\(P = 5000 \\cdot 2 = 10000\\text{ W}\\). d Sai vì nhanh dần thì lực kéo phải lớn hơn." },
-        { id: "ETF3", context: "Hai xe ôtô có khối lượng \\(m_1 = 2m_2\\), chạy with vận tốc \\(v_1 = \\frac{v_2}{2}\\).", statements: ["a) Động năng của hai xe là hoàn toàn bằng nhau.", "b) Nếu hãm phanh with cùng một lực, quãng đường phanh của xe 2 dài gấp đôi xe 1.", "c) Động năng của xe 2 lớn gấp 2 lần động năng của xe 1.", "d) Quán tính của xe 1 lớn gấp 2 lần quán tính của xe 2."], correctPattern: [false, true, true, true], explanation: "a Sai vì \\(W_{d1} = \\frac{1}{2}(2m_2)(v_2/2)^2 = \\frac{1}{4}m_2 v_2^2 = \\frac{W_{d2}}{2}\\). c Đúng." },
-        { id: "ETF4", context: "Một vật được ném thẳng đứng lên cao trong không khí (có lực cản).", statements: ["a) Lực cản của không khí sinh công âm trong suốt quá trình chuyển động.", "b) Cơ năng của vật giảm dần theo thời gian do sự hao phí.", "c) Tại điểm cao nhất, gia tốc của vật bằng 0.", "d) Thời gian vật rơi xuống nhỏ hơn thời gian vật ném lên."], correctPattern: [true, true, false, false], explanation: "c Sai vì gia tốc tại điểm cao nhất bằng g hướng xuống. d Sai vì do mất cơ năng, vận tốc rơi giảm, làm thời gian đi xuống lớn hơn." }
-    ];
+// =====================================================================
+// BỘ 2: NGÂN HÀNG KIỂM TRA (Dành cho HS Khá trở lên - Vận dụng & VD Cao)
+// Cấu trúc: 40 Đa lựa chọn + 20 Đúng/Sai + 20 Trả lời ngắn
+// =====================================================================
 
-    const examShort = [
-        { id: "ESA1", question: "Một máy bơm có công suất 2 kW. Trong 10 phút, máy bơm thực hiện một công là bao nhiêu kJ?", answer: "1200", explanation: "\\(P = 2\\text{ kW} = 2000\\text{ W}. t = 10 \\cdot 60 = 600\\text{ s}. A = 2000 \\cdot 600 = 1200000\\text{ J} = 1200\\text{ kJ}.\\)" },
-        { id: "ESA2", question: "Kéo một vật 50 kg lên cao bằng 1 ròng rọc động (lợi 2 lần về lực). Bỏ qua ma sát. Lực kéo tác dụng vào dây là bao nhiêu N?", answer: "250", explanation: "Trọng lượng vật \\(P = 500\\text{ N}\\). Dùng 1 ròng rọc động nên lực kéo giảm một nửa: \\(F = 500/2 = 250\\text{ N}.\\)" },
-        { id: "ESA3", question: "Một ôtô nặng 1,5 tấn đang chạy with tốc độ 36 km/h. Tính động năng của ôtô này theo kJ.", answer: "75", explanation: "Vận tốc \\(v = 10\\text{ m/s}\\). \\(W_d = 0,5 \\cdot 1500 \\cdot 10^2 = 75000\\text{ J} = 75\\text{ kJ}.\\)" },
-        { id: "ESA4", question: "Vật khối lượng 0,5 kg được ném thẳng lên with vận tốc 10 m/s từ đất. Bỏ qua ma sát (g=10). Ở độ cao bao nhiêu mét thì động năng bằng thế năng?", answer: "2,5", explanation: "Cơ năng \\(W = \\frac{1}{2}mv^2 = 25\\text{ J}\\). Khi \\(W_d = W_t\\) thì \\(W = 2W_t = 2Ph \\Rightarrow 25 = 2 \\cdot 0,5 \\cdot 10 \\cdot h \\Rightarrow h = 2,5\\text{ m}.\\)" }
-    ];
+const examMCQ = [
+  { id: "E_MCQ_1", question: "Một ô tô tăng tốc độ từ 10 m/s lên 20 m/s. Động năng của ô tô thay đổi như thế nào?", options: ["Tăng 2 lần.", "Tăng 4 lần.", "Giảm 2 lần.", "Tăng 10 lần."], correctAnswer: "Tăng 4 lần.", hint: "Động năng tỉ lệ với bình phương vận tốc.", explanation: "Vận tốc tăng 2 lần thì bình phương vận tốc tăng 4 lần, nên động năng tăng 4 lần." },
+  { id: "E_MCQ_2", question: "Một vật nặng 2 kg thả rơi từ độ cao 10 m xuống đất. Bỏ qua ma sát (g=10m/s²). Động năng của vật khi ở độ cao 4 m là", options: ["120 J.", "80 J.", "200 J.", "100 J."], correctAnswer: "120 J.", hint: "Tính độ giảm thế năng.", explanation: "Cơ năng ban đầu: 200J. Thế năng ở độ cao 4m: 80J. Động năng = 200 - 80 = 120J." },
+  { id: "E_MCQ_3", question: "Khi một vật ném thẳng đứng lên cao, tại điểm cao nhất thì", options: ["Động năng cực đại, thế năng bằng không.", "Thế năng cực đại, động năng bằng không.", "Động năng và thế năng bằng nhau.", "Cơ năng bằng không."], correctAnswer: "Thế năng cực đại, động năng bằng không.", hint: "Tại điểm cao nhất vật đổi chiều (v=0).", explanation: "Tại điểm cao nhất v=0 nên W_đ=0, toàn bộ cơ năng là thế năng cực đại." },
+  { id: "E_MCQ_4", question: "Một người kéo một gàu nước 10kg từ giếng sâu 10m lên trong 20s. Lấy g=10. Công suất của người đó là", options: ["100 W.", "50 W.", "200 W.", "5 W."], correctAnswer: "50 W.", hint: "Tính P_trọng lượng, rồi tính Công.", explanation: "P = 100N. A = 100*10 = 1000J. Công suất = 1000/20 = 50 W." },
+  { id: "E_MCQ_5", question: "Máy bơm A (1kW) bơm đầy bồn trong 1 giờ. Máy bơm B (2kW) bơm đầy bồn đó mất bao lâu?", options: ["1 giờ.", "2 giờ.", "30 phút.", "15 phút."], correctAnswer: "30 phút.", hint: "Công bơm đầy bồn là như nhau.", explanation: "P_A * t_A = P_B * t_B => 1 * 60 = 2 * t_B => t_B = 30 phút." },
+  { id: "E_MCQ_6", question: "Một xe tải 2 tấn đang chạy 36km/h. Cần một lực hãm phanh sinh công bằng bao nhiêu để xe dừng lại?", options: ["-100 kJ.", "-36 kJ.", "-10000 J.", "-360 kJ."], correctAnswer: "-100 kJ.", hint: "Đổi 36km/h ra m/s. Công hãm bằng độ giảm động năng.", explanation: "v = 10m/s. W_đ ban đầu = 0.5*2000*100 = 100.000J = 100kJ. Công cản A = 0 - 100kJ = -100kJ." },
+  { id: "E_MCQ_7", question: "Một chiếc xe điện có tổng khối lượng 200 kg. Khi xe đạt được động năng 2500 J thì tốc độ của xe là", options: ["5 m/s.", "10 m/s.", "25 m/s.", "12.5 m/s."], correctAnswer: "5 m/s.", hint: "Tính v từ công thức W_đ.", explanation: "\\(v = \\sqrt{\\frac{2W_đ}{m}} = \\sqrt{\\frac{5000}{200}} = \\sqrt{25} = 5\\text{ m/s}.\\)" },
+  { id: "E_MCQ_8", question: "Một thùng nước có trọng lượng 200 N. Để thùng nước có thế năng là 500 J thì độ cao phải là", options: ["2,5 m.", "5 m.", "10 m.", "0,4 m."], correctAnswer: "2,5 m.", hint: "h = W_t / P", explanation: "\\(h = \\frac{500}{200} = 2,5\\text{ m}.\\)" },
+  { id: "E_MCQ_9", question: "Hai người cùng kéo gạch lên cao. Người 1 kéo 10 viên trong 20s. Người 2 kéo 15 viên trong 30s. So sánh công suất?", options: ["Người 1 mạnh hơn.", "Người 2 mạnh hơn.", "Bằng nhau.", "Không thể so sánh."], correctAnswer: "Bằng nhau.", hint: "Tính tốc độ kéo viên/s.", explanation: "10/20 = 0.5 viên/s. 15/30 = 0.5 viên/s. Tốc độ sinh công bằng nhau." },
+  { id: "E_MCQ_10", question: "Để đưa vật 500N lên cao bằng ròng rọc động, phải kéo dây đi 10m. Công thực hiện là (bỏ qua ma sát)", options: ["5000 J.", "2500 J.", "250 J.", "1000 J."], correctAnswer: "2500 J.", hint: "Bảo toàn công. Lực kéo F = 250N, s = 10m.", explanation: "\\(A = F \\cdot s = 250 \\cdot 10 = 2500\\text{ J}.\\) Hoặc nâng vật 500N lên 5m (vì kéo dây 10m)." },
+  { id: "E_MCQ_11", question: "Tại sao khi xây đập thủy điện phải xây thật cao?", options: ["Để nước chảy đẹp.", "Để nuôi cá.", "Tạo thế năng lớn chuyển thành động năng quay tuabin.", "Giảm áp lực nước."], correctAnswer: "Tạo thế năng lớn chuyển thành động năng quay tuabin.", hint: "Thế năng phụ thuộc h.", explanation: "Độ cao lớn tạo thế năng lớn, chuyển hóa thành động năng sinh công phát điện." },
+  { id: "E_MCQ_12", question: "Dùng mặt phẳng nghiêng dài 4m đẩy vật nặng lên cao 1m. Bỏ qua ma sát. Lực đẩy bằng bao nhiêu phần trọng lượng vật?", options: ["1/4.", "1/2.", "Bằng nhau.", "Gấp 4 lần."], correctAnswer: "1/4.", hint: "Định luật bảo toàn công: F.l = P.h", explanation: "F*4 = P*1 => F = P/4." },
+  { id: "E_MCQ_13", question: "Một người có công suất 150 W thực hiện công 4500 J trong thời gian", options: ["675000 s.", "30 s.", "3 s.", "45 s."], correctAnswer: "30 s.", hint: "t = A / P", explanation: "\\(t = \\frac{4500}{150} = 30\\text{ s}.\\)" },
+  { id: "E_MCQ_14", question: "Một vật rơi tự do, tại điểm M thế năng bằng 1/3 động năng. Cơ năng bằng bao nhiêu lần thế năng tại M?", options: ["4.", "3.", "1.33.", "0.25."], correctAnswer: "4.", hint: "W = W_đ + W_t.", explanation: "W_đ = 3W_t => W = 3W_t + W_t = 4W_t." },
+  { id: "E_MCQ_15", question: "Vận tốc vật giảm đi một nửa thì động năng thay đổi thế nào?", options: ["Giảm 2 lần.", "Giảm 4 lần.", "Không đổi.", "Tăng 2 lần."], correctAnswer: "Giảm 4 lần.", hint: "Tỉ lệ với bình phương.", explanation: "\\((1/2)^2 = 1/4\\). Động năng giảm 4 lần." },
+  { id: "E_MCQ_16", question: "Một chiếc xe máy có động cơ sinh lực kéo 500N chạy đều 10m/s. Công suất xe là", options: ["50 W.", "5000 W.", "510 W.", "2000 W."], correctAnswer: "5000 W.", hint: "P = F*v", explanation: "\\(P = F \\cdot v = 500 \\cdot 10 = 5000\\text{ W}.\\)" },
+  { id: "E_MCQ_17", question: "Con bò kéo xe với lực 200N đi 10km. Công của bò là", options: ["2000 J.", "2.000.000 J.", "20 kJ.", "200 J."], correctAnswer: "2.000.000 J.", hint: "Đổi km ra m.", explanation: "\\(A = 200 \\cdot 10000 = 2.000.000\\text{ J}.\\)" },
+  { id: "E_MCQ_18", question: "Bóng đèn 60W thắp sáng 1 giờ tiêu thụ năng lượng là", options: ["60 J.", "3600 J.", "216000 J.", "600 J."], correctAnswer: "216000 J.", hint: "1h = 3600s.", explanation: "\\(A = 60 \\cdot 3600 = 216000\\text{ J}.\\)" },
+  { id: "E_MCQ_19", question: "Nước từ độ cao 10m chảy xuống với lưu lượng 10kg/s. Công suất dòng nước là", options: ["1000 W.", "100 W.", "10000 W.", "10 W."], correctAnswer: "1000 W.", hint: "P_nước = 100N. Tính công trong 1s.", explanation: "Trong 1s trọng lượng nước P=100N rơi 10m. A=1000J. P = 1000W." },
+  { id: "E_MCQ_20", question: "Cơ năng bảo toàn khi nào?", options: ["Chỉ có lực ma sát.", "Không có lực cản, ma sát.", "Luôn bảo toàn.", "Khi vật đứng yên."], correctAnswer: "Không có lực cản, ma sát.", hint: "Lực cản làm tiêu hao năng lượng.", explanation: "Cơ năng chỉ bảo toàn khi hệ không chịu tác dụng của lực cản, ma sát." },
+  { id: "E_MCQ_21", question: "Một vật 500g ném thẳng lên với vận tốc 10m/s. Bỏ qua ma sát. Cơ năng vật là", options: ["50 J.", "25 J.", "100 J.", "5 J."], correctAnswer: "25 J.", hint: "Tính W_đ lúc ném.", explanation: "\\(W = W_đ = 0.5 \\cdot 0.5 \\cdot 100 = 25\\text{ J}.\\)" },
+  { id: "E_MCQ_22", question: "Lực ma sát thực hiện công gì?", options: ["Dương.", "Âm.", "Không sinh công.", "Bằng thế năng."], correctAnswer: "Âm.", hint: "Ngược chiều chuyển động.", explanation: "Lực ma sát luôn ngược hướng chuyển động nên sinh công âm (công cản)." },
+  { id: "E_MCQ_23", question: "Ròng rọc cố định có tác dụng gì?", options: ["Lợi 2 lần lực.", "Lợi 2 lần công.", "Chỉ đổi hướng lực kéo.", "Tăng công suất."], correctAnswer: "Chỉ đổi hướng lực kéo.", hint: "Không thay đổi độ lớn F.", explanation: "Ròng rọc cố định không cho lợi về lực hay đường đi, chỉ đổi hướng." },
+  { id: "E_MCQ_24", question: "Máy bơm bơm 120 lít nước (120kg) lên cao 10m trong 1 phút. Công suất là", options: ["200 W.", "1200 W.", "120 W.", "20 W."], correctAnswer: "200 W.", hint: "P_trọng lượng = 1200N.", explanation: "A = 1200*10 = 12000J. P = 12000/60 = 200W." },
+  { id: "E_MCQ_25", question: "Vật ở mặt đất được bắn lên với v=20m/s (g=10m/s²). Độ cao cực đại là", options: ["10 m.", "20 m.", "40 m.", "5 m."], correctAnswer: "20 m.", hint: "W_đ chuyển hết thành W_t.", explanation: "0.5*m*v^2 = m*g*h => 0.5*400 = 10*h => h = 20m." },
+  { id: "E_MCQ_26", question: "Tại sao khi đạp xe lên dốc ta phải dùng sức nhiều hơn?", options: ["Động năng xe tăng.", "Phải sinh công thắng thành phần trọng lực cản trở.", "Ma sát mất đi.", "Thế năng tự động đẩy xe lùi."], correctAnswer: "Phải sinh công thắng thành phần trọng lực cản trở.", hint: "Trọng lực hướng xuống đất kéo xe lùi.", explanation: "Khi lên dốc, trọng lực có thành phần song song mặt dốc cản trở chuyển động." },
+  { id: "E_MCQ_27", question: "Một người 50kg vác bao gạo 50kg leo cầu thang lên cao 10m. Công sinh ra tổng cộng là", options: ["5000 J.", "10000 J.", "500 J.", "0 J."], correctAnswer: "10000 J.", hint: "Tổng khối lượng m = 100kg.", explanation: "Trọng lượng tổng P = 1000N. A = 1000 * 10 = 10000 J." },
+  { id: "E_MCQ_28", question: "Trái tim 1 nhịp đập sinh 1.2J. 1 phút đập 75 nhịp. Công suất là", options: ["1.5 W.", "90 W.", "0.02 W.", "15 W."], correctAnswer: "1.5 W.", hint: "Chia cho 60s.", explanation: "A = 1.2*75 = 90J. P = 90/60 = 1.5 W." },
+  { id: "E_MCQ_29", question: "Quả bóng rơi bị nảy lên không cao bằng vị trí ban đầu vì", options: ["Thế năng tăng.", "Một phần cơ năng chuyển thành nhiệt và âm thanh.", "Động năng tạo thêm khối lượng.", "Lực hút trái đất mạnh hơn."], correctAnswer: "Một phần cơ năng chuyển thành nhiệt và âm thanh.", hint: "Có hao phí.", explanation: "Va chạm làm một phần cơ năng mất đi dạng nhiệt/âm." },
+  { id: "E_MCQ_30", question: "Một vật trượt không ma sát xuống mặt phẳng nghiêng. Chọn phát biểu ĐÚNG.", options: ["Thế năng không đổi.", "Động năng giảm dần.", "Cơ năng bảo toàn.", "Cơ năng giảm dần."], correctAnswer: "Cơ năng bảo toàn.", hint: "Không có ma sát.", explanation: "Khi không có ma sát, cơ năng của hệ được bảo toàn tuyệt đối." },
+  { id: "E_MCQ_31", question: "Một chiếc quạt 45W quay liên tục 1 giờ. Lượng điện năng tiêu thụ (tương đương công) là", options: ["45 J.", "2700 J.", "162000 J.", "162 kJ."], correctAnswer: "162000 J.", hint: "1h = 3600s.", explanation: "A = 45 * 3600 = 162000 J." },
+  { id: "E_MCQ_32", question: "1 kWh (Kí lô oát giờ) bằng bao nhiêu Joule?", options: ["1000 J.", "3.600.000 J.", "3600 J.", "1.000.000 J."], correctAnswer: "3.600.000 J.", hint: "1kW = 1000W, 1h = 3600s.", explanation: "1000 W * 3600 s = 3.600.000 J." },
+  { id: "E_MCQ_33", question: "Kéo 1 vật bằng ròng rọc động cần lực 50N. Trọng lượng thực của vật là bao nhiêu (bỏ qua ma sát, khối lượng ròng rọc)?", options: ["50 N.", "25 N.", "100 N.", "200 N."], correctAnswer: "100 N.", hint: "Lợi 2 lần về lực.", explanation: "F = P/2 => P = 2*50 = 100N." },
+  { id: "E_MCQ_34", question: "Vận động viên giữ tạ 100kg đứng yên qua đầu trong 5s. Công sinh ra là", options: ["5000 J.", "500 J.", "0 J.", "2500 J."], correctAnswer: "0 J.", hint: "s = 0.", explanation: "Không có dịch chuyển (s=0) nên A=0." },
+  { id: "E_MCQ_35", question: "Công suất định mức ghi trên thiết bị cho biết", options: ["Tốc độ tiêu thụ năng lượng khi hoạt động bình thường.", "Lực máy kéo được tối đa.", "Thời gian máy chạy được.", "Quãng đường máy đi được."], correctAnswer: "Tốc độ tiêu thụ năng lượng khi hoạt động bình thường.", hint: "Khái niệm vật lí 9.", explanation: "Công suất định mức là P năng lượng tiêu thụ trong 1s đk chuẩn." },
+  { id: "E_MCQ_36", question: "Thả vật m từ h. Chạm đất v=20m/s. Bỏ qua ma sát. h bằng bao nhiêu? (g=10)", options: ["10 m.", "20 m.", "40 m.", "100 m."], correctAnswer: "20 m.", hint: "mgh = 0.5*m*v^2", explanation: "10*h = 0.5*400 = 200 => h = 20m." },
+  { id: "E_MCQ_37", question: "Một máy tời điện 2kW kéo vật 200kg lên 5m mất bao lâu? (g=10, không hao phí)", options: ["5 s.", "10 s.", "2 s.", "50 s."], correctAnswer: "5 s.", hint: "A = 2000*5 = 10000J.", explanation: "t = 10000 / 2000 = 5s." },
+  { id: "E_MCQ_38", question: "Lực cản của gió tác dụng lên ô tô đang chạy có phương chiều thế nào?", options: ["Vuông góc mặt đường.", "Cùng chiều chạy.", "Ngược chiều chạy.", "Hướng xuống đất."], correctAnswer: "Ngược chiều chạy.", hint: "Ma sát/cản luôn cản trở.", explanation: "Sinh công âm, ngược chiều chuyển động." },
+  { id: "E_MCQ_39", question: "Một cần cẩu A nâng vật 1000N lên 2m mất 5s. Cần cẩu B nâng vật 500N lên 4m mất 4s. Chọn câu đúng.", options: ["A khỏe hơn B.", "B khỏe hơn A.", "A sinh nhiều công hơn B.", "B sinh ít công hơn A."], correctAnswer: "B khỏe hơn A.", hint: "Tính P_A và P_B.", explanation: "A_A = 2000J, P_A = 400W. A_B = 2000J, P_B = 500W. B có công suất lớn hơn." },
+  { id: "E_MCQ_40", question: "Đồ thị biểu diễn mối quan hệ giữa Động năng và Bình phương vận tốc là", options: ["Đường cong parabol.", "Đường thẳng qua gốc tọa độ.", "Đường thẳng song song trục hoành.", "Đường hypebol."], correctAnswer: "Đường thẳng qua gốc tọa độ.", hint: "y = ax.", explanation: "\\(W_đ = 0.5m \\cdot v^2\\). W_đ tỉ lệ thuận bậc nhất với \\(v^2\\), là đường thẳng qua gốc O." }
+];
+
+const examTF = [
+  { id: "E_TF_1", context: "Hai máy xúc đào đất. Máy A thực hiện công 100 kJ trong 50 giây. Máy B thực hiện công 80 kJ trong 30 giây.", statements: ["a) Máy A thực hiện công nhiều hơn máy B nên máy A có công suất lớn hơn.", "b) Công suất của máy B lớn hơn công suất của máy A.", "c) Tốc độ đào đất của máy B nhanh hơn máy A.", "d) Máy A tốn thời gian hơn để thực hiện 1 Joule công so với máy B."], correctPattern: [false, true, true, true], hint: "Tính A/t của hai máy.", explanation: "Ý a sai vì \\(P_B = 2.67\\text{ kW} > P_A = 2\\text{ kW}\\). B làm nhanh hơn." },
+  { id: "E_TF_2", context: "Khi sử dụng ròng rọc cố định kéo một vật 200 N lên cao 5 m. Bỏ qua ma sát.", statements: ["a) Lực kéo tay của người công nhân phải bằng 200 N.", "b) Chiều dài đoạn dây bị kéo đi là 10 m.", "c) Công thực hiện là 1000 J.", "d) Máy cơ này không cho lợi về lực cũng không cho lợi về đường đi."], correctPattern: [true, false, true, true], hint: "Cố định chỉ đổi hướng.", explanation: "b) Sai vì đoạn dây kéo đi chỉ bằng đúng độ cao h = 5m." },
+  { id: "E_TF_3", context: "Máy bơm A (2 kW) bơm đầy bồn trong 1 giờ. Máy bơm B (1.5 kW) bơm đầy bồn đó trong 1.5 giờ.", statements: ["a) Bồn nước khi đầy dự trữ cùng một lượng thế năng như nhau đối với cả 2 máy.", "b) Máy A tiêu tốn 2 kWh điện năng để bơm đầy.", "c) Máy B tiêu tốn 2.25 kWh điện năng để bơm đầy.", "d) Máy B có hiệu suất sử dụng điện năng tốt hơn máy A."], correctPattern: [true, true, true, false], hint: "Bơm cùng lượng nước nhưng tốn nhiều điện hơn thì hiệu suất kém.", explanation: "d) Sai vì máy B tốn 2.25kWh > máy A (2kWh) để làm cùng 1 việc, tức hiệu suất thấp hơn." },
+  { id: "E_TF_4", context: "Một vật nặng 1 kg rơi tự do từ độ cao 20 m xuống đất. Lấy g = 10 m/s². Chọn mặt đất làm mốc.", statements: ["a) Cơ năng ban đầu của vật là 200 J.", "b) Tại mặt đất, động năng của vật bằng 0.", "c) Ở độ cao 10m, động năng bằng thế năng và bằng 100 J.", "d) Nếu rơi được 2s thì vật sẽ chạm mặt đất (Dùng công thức rơi tự do \\(h = 0.5gt^2\\))."], correctPattern: [true, false, true, true], hint: "Động năng cực đại tại mặt đất.", explanation: "b) Sai vì tại mặt đất động năng cực đại (200J). d) Đúng: \\(0.5 \\cdot 10 \\cdot 2^2 = 20\\text{m}\\)." },
+  { id: "E_TF_5", context: "Người đi xe máy (100 kg tổng) chạy tốc độ 10 m/s rồi tăng lên 20 m/s trên đường ngang.", statements: ["a) Động năng ban đầu là 5000 J.", "b) Động năng lúc sau là 10000 J.", "c) Động năng đã tăng thêm 15000 J do động cơ sinh công phát động.", "d) Thế năng của xe bằng 0 nếu chọn mặt đường làm mốc."], correctPattern: [true, false, true, true], hint: "Tốc độ tăng 2 lần thì động năng tăng 4 lần.", explanation: "b) Sai vì W_đ sau = 20000 J. c) Tăng thêm: 20000 - 5000 = 15000 J (Đúng)." },
+  { id: "E_TF_6", context: "Người thợ dùng 1 ròng rọc động kéo vật 400N lên cao 5m.", statements: ["a) Lực kéo cần thiết (bỏ qua ma sát, ròng rọc nhẹ) là 200 N.", "b) Quãng đường phải kéo dây là 5 m.", "c) Công của người thợ thực hiện là 2000 J.", "d) Dù dùng ròng rọc động thì công bỏ ra vẫn bằng công khi nhấc trực tiếp."], correctPattern: [true, false, true, true], hint: "Thiệt 2 lần về đường đi.", explanation: "b) Sai vì quãng đường s = 2*h = 10 m." },
+  { id: "E_TF_7", context: "Một đòn bẩy dùng để bẩy tảng đá. Cánh tay đòn của lực bẩy gấp 4 lần cánh tay đòn của trọng lượng đá.", statements: ["a) Đòn bẩy giúp người đó dùng lực nhỏ hơn trọng lượng đá 4 lần.", "b) Người đó phải ấn đầu đòn bẩy xuống 1 quãng đường gấp 4 lần độ cao đá nâng lên.", "c) Đòn bẩy giúp lợi 4 lần về công.", "d) Sự thiệt thòi về đường đi bù đắp chính xác cho sự lợi ích về lực."], correctPattern: [true, true, false, true], hint: "Định luật bảo toàn công.", explanation: "c) Sai vì không có máy cơ nào cho ta lợi về công." },
+  { id: "E_TF_8", context: "Nước từ trên thác cao 50m đổ xuống đập vào cánh quạt tuabin.", statements: ["a) Nước ở đỉnh thác tích trữ lượng thế năng trọng trường lớn.", "b) Trong lúc rơi, động năng của nước chuyển dần thành thế năng.", "c) Cơ năng của dòng nước được chuyển hóa thành điện năng tại máy phát.", "d) Nếu thác có độ cao thấp hơn thì công suất phát điện sẽ nhỏ hơn (cùng lưu lượng)."], correctPattern: [true, false, true, true], hint: "Chiều chuyển hóa khi rơi xuống.", explanation: "b) Sai vì thế năng chuyển thành động năng chứ không phải ngược lại." },
+  { id: "E_TF_9", context: "Một học sinh ném quả bóng rổ 0.5kg từ tay ở độ cao 2m (đang đứng) thẳng lên rổ cao 3m.", statements: ["a) Mốc thế năng tại mặt đất, thế năng quả bóng tại tay học sinh là 10 J.", "b) Để quả bóng lên tới rổ (vừa chạm), công của lực ném phải truyền cho bóng ít nhất 5 J động năng.", "c) Quả bóng đang bay từ tay lên rổ thì động năng tăng dần.", "d) Cơ năng của quả bóng khi rời tay là 15 J (nếu vừa chạm rổ)."], correctPattern: [true, true, false, true], hint: "Độ chênh lệch h là 1m. P = 5N.", explanation: "c) Sai vì bay lên thì tốc độ chậm lại, động năng giảm." },
+  { id: "E_TF_10", context: "Đẩy chiếc xe rùa bằng lực nằm ngang F=50N đi 10m trên sân đất. Có ma sát.", statements: ["a) Công của lực đẩy là 500 J.", "b) Trọng lực của xe rùa sinh công bằng khối lượng nhân 10m.", "c) Lực đẩy F cùng phương chiều với hướng dịch chuyển.", "d) Lực ma sát sinh công âm."], correctPattern: [true, false, true, false], hint: "Trọng lực vuông góc mặt đất.", explanation: "b) Sai vì trọng lực vuông góc đường đi nằm ngang nên công bằng 0." },
+  { id: "E_TF_11", context: "Bóng đèn sợi đốt ghi 60W, được thắp sáng liên tục.", statements: ["a) 60W là năng lượng tiêu thụ trong mỗi giây.", "b) Trong 2 giờ, công đèn tiêu thụ là 120 J.", "c) Điện năng đã chuyển hóa thành nhiệt năng và quang năng.", "d) Nếu đèn ghi 100W thì trong cùng 1 giây sẽ tiêu thụ nhiều năng lượng hơn đèn 60W."], correctPattern: [true, false, true, true], hint: "2 giờ = 7200 giây.", explanation: "b) Sai vì A = 60 * 7200 = 432.000 J." },
+  { id: "E_TF_12", context: "Tàu hỏa đang chạy trên đường ray thẳng nằm ngang.", statements: ["a) Tàu hỏa rất nặng nên thế năng trọng trường (so với đường) vô cùng lớn.", "b) Động năng của tàu rất lớn do khối lượng lớn.", "c) Lực cản không khí và ma sát sinh công âm cản trở tàu.", "d) Động cơ tàu phải sinh công dương liên tục để duy trì tốc độ."], correctPattern: [false, true, true, true], hint: "Mốc ở mặt đường.", explanation: "a) Sai vì h=0 so với mặt đường thì thế năng W_t = 0." },
+  { id: "E_TF_13", context: "Vật m dao động gắn lò xo trên mặt phẳng ngang không ma sát.", statements: ["a) Khi lò xo giãn nhiều nhất (v=0), động năng của vật bằng 0.", "b) Thế năng ở vị trí này là thế năng đàn hồi, đạt cực đại.", "c) Cơ năng của hệ thống không được bảo toàn.", "d) Khi vật qua vị trí cân bằng, tốc độ cực đại, động năng cực đại."], correctPattern: [true, true, false, true], hint: "Hệ không ma sát.", explanation: "c) Sai vì không ma sát nên cơ năng bảo toàn tuyệt đối." },
+  { id: "E_TF_14", context: "Thang máy 1000 kg kéo lên 15m trong 10 giây (g=10m/s²). Động cơ chạy đều.", statements: ["a) Trọng lượng thang máy là 10.000 N.", "b) Công sinh ra để kéo thang máy là 150.000 J.", "c) Công suất của động cơ là 15.000 W (15 kW).", "d) Nếu thời gian kéo là 20 giây thì công kéo thang lên (A) sẽ bị giảm một nửa."], correctPattern: [true, true, true, false], hint: "Công A chỉ phụ thuộc F và s.", explanation: "d) Sai vì công A không đổi (150.000 J), chỉ có công suất P bị giảm một nửa." },
+  { id: "E_TF_15", context: "Công nhân vác bao xi măng 50kg đi thẳng đều trên đường ngang dài 20m.", statements: ["a) Lực nâng của vai công nhân tác dụng lên bao xi măng là 500 N.", "b) Công của lực nâng trong lúc đi bộ là 10000 J.", "c) Phương lực nâng vuông góc với hướng dịch chuyển ngang.", "d) Công nhân vẫn tốn sức do cơ bắp tiêu hao năng lượng sinh học."], correctPattern: [true, false, true, true], hint: "Góc 90 độ thì sinh công 0.", explanation: "b) Sai vì A = 0 J do lực vuông góc đường đi." },
+  { id: "E_TF_16", context: "Quạt trần 45W quay liên tục.", statements: ["a) Nó chuyển hóa cơ năng thành điện năng.", "b) Bỏ qua hao phí, mỗi giây nó tạo ra 45 J công cơ học (quay cánh).", "c) Cánh quạt quay nhanh có động năng lớn.", "d) Vì quạt treo cao trên trần nên hệ thống (quạt-trái đất) có dự trữ thế năng."], correctPattern: [false, true, true, true], hint: "Chức năng của quạt.", explanation: "a) Sai vì quạt tiêu thụ điện sinh ra cơ, chuyển điện năng -> cơ năng." },
+  { id: "E_TF_17", context: "Nước chảy trong ống dẫn nước nằm ngang với tốc độ không đổi.", statements: ["a) Động năng của nước trong ống không đổi.", "b) Thế năng của nước thay đổi liên tục vì nước chảy đi xa.", "c) Nếu ống bị hẹp lại, vận tốc nước chảy nhanh hơn thì động năng tại đó tăng.", "d) Ống nằm ngang nên trọng lực không sinh công lên dòng nước chảy."], correctPattern: [true, false, true, true], hint: "h không đổi.", explanation: "b) Sai vì ống ngang nên h không đổi, thế năng không đổi." },
+  { id: "E_TF_18", context: "Hai nhóm kéo co. Nhóm A kéo được nhóm B dịch chuyển 2m về phía A với lực 500N.", statements: ["a) Nhóm A sinh công dương là 1000 J.", "b) Nhóm B cũng sinh công dương 1000 J.", "c) Nhóm B bị kéo ngược lại lực của mình nên chịu công âm.", "d) Dây thừng trung gian thực hiện công truyền lực giữa hai nhóm."], correctPattern: [true, false, true, true], hint: "Chiều dịch chuyển và chiều lực nhóm B.", explanation: "b) Sai vì nhóm B sinh/chịu công âm (lực ngược hướng đi)." },
+  { id: "E_TF_19", context: "Viên đạn 10g bay ngang với vận tốc 400 m/s ở độ cao 5m so với mặt đất.", statements: ["a) Động năng viên đạn là 800 J.", "b) Thế năng (mốc mặt đất) viên đạn là 0.5 J.", "c) Vì đạn bay ngang nên cơ năng bằng động năng.", "d) Khi găm vào bia gỗ và dừng lại, toàn bộ động năng chuyển thành công cản phá gỗ và nhiệt."], correctPattern: [true, true, false, true], hint: "Đổi 10g = 0.01kg.", explanation: "c) Sai vì h=5m nên vẫn có thế năng, Cơ năng = Động năng + Thế năng." },
+  { id: "E_TF_20", context: "Cần cẩu A (10kW) và B (15kW).", statements: ["a) Cần cẩu B luôn thực hiện được nhiều công hơn A trong mọi tình huống.", "b) Trong cùng 1 khoảng thời gian, B thực hiện nhiều công hơn A.", "c) Để nâng cùng 1 vật lên cùng độ cao (cùng sinh công A), B làm xong nhanh hơn.", "d) B 'khỏe' hơn A tức là có tốc độ thực hiện công lớn hơn."], correctPattern: [false, true, true, true], hint: "Định nghĩa công suất.", explanation: "a) Sai vì nếu A chạy 10 giờ, B chạy 1 giây thì A sinh nhiều công hơn. So sánh công phải chốt thời gian." }
+];
+
+const examShort = [
+  { id: "E_SA_1", question: "Cho các nhận định:<br/>(1) Động năng là năng lượng do chuyển động.<br/>(2) Vật có khối lượng càng lớn thì động năng luôn lớn hơn.<br/>(3) Khi vật dừng lại, động năng bằng không.<br/>(4) Tốc độ tăng gấp đôi thì động năng tăng gấp đôi.<br/>(5) Đơn vị động năng là J.<br/>(6) Động năng KHÔNG phụ thuộc khối lượng.<br/>(7) Vật 1kg, 2m/s thì động năng là 2J.<br/>(8) Động năng có thể âm.<br/>Ghi chuỗi số các nhận định ĐÚNG tăng dần.", answer: "1357", hint: "Động năng không thể âm.", explanation: "Các ý đúng là 1, 3, 5, 7. Ý 2 sai vì thiếu đk vận tốc. Ý 4 sai (tăng 4). Ý 6 sai. Ý 8 sai (v^2 dương)." },
+  { id: "E_SA_2", question: "Cho các nhận định:<br/>(1) Thế năng phụ thuộc P và h.<br/>(2) Vật trên mặt đất thế năng bằng 0 (nếu chọn mặt đất làm mốc).<br/>(3) Đơn vị thế năng là N.<br/>(4) Ở độ cao lớn hơn thì thế năng luôn lớn hơn.<br/>(5) Công thức W_t=P.h.<br/>(6) Khi rơi tự do, thế năng tăng dần.<br/>(7) Thế năng là năng lượng cơ năng.<br/>(8) Thế năng phụ thuộc tốc độ rơi.<br/>Ghi chuỗi số nhận định ĐÚNG.", answer: "1257", hint: "Thế năng rơi tự do sẽ giảm dần.", explanation: "Các ý đúng là 1, 2, 5, 7." },
+  { id: "E_SA_3", question: "Cho nhận định:<br/>(1) Công tỉ lệ thuận F và s.<br/>(2) Công suất bằng tích công và thời gian.<br/>(3) Công suất lớn thực hiện công nhanh.<br/>(4) J bằng N/m.<br/>(5) F vuông góc s thì công bằng 0.<br/>(6) Vác gạo đứng yên không sinh công.<br/>(7) HP đo lực ngựa.<br/>(8) Công suất định mức là tốc độ tối đa.<br/>Ghi chuỗi số nhận định ĐÚNG.", answer: "1356", hint: "Joule tương đương N.m chứ không phải N/m.", explanation: "Các ý đúng là 1, 3, 5, 6." },
+  { id: "E_SA_4", question: "Cho nhận định:<br/>(1) Ròng rọc cố định lợi 2 lần lực.<br/>(2) Mặt phẳng nghiêng càng dài lực kéo càng nhỏ.<br/>(3) Ròng rọc động lợi 2 lần đường đi.<br/>(4) Tăng P cần giảm t.<br/>(5) Đòn bẩy dài đỡ tốn công.<br/>(6) Máy cơ không lợi về công.<br/>(7) Kéo thẳng đứng lực kéo bằng P vật.<br/>(8) Máy cơ tốn ít công hơn nhấc trực tiếp.<br/>Ghi chuỗi số nhận định ĐÚNG.", answer: "2467", hint: "Không một máy cơ đơn giản nào cho ta lợi về công.", explanation: "Các ý đúng là 2, 4, 6, 7." },
+  { id: "E_SA_5", question: "Một chiếc xe điện có tổng khối lượng 200 kg. Khi xe đạt được động năng 2500 J thì tốc độ của xe là bao nhiêu m/s?", answer: "5", hint: "Sử dụng công thức tính v từ động năng.", explanation: "\\(v = \\sqrt{\\frac{5000}{200}} = 5\\text{ m/s}.\\)" },
+  { id: "E_SA_6", question: "Một người có trọng lượng 500 N leo từ tầng 1 lên tầng 4 của một tòa nhà. Biết mỗi tầng cao 3,5 m. Công mà người đó thực hiện là bao nhiêu Joule?", answer: "5250", hint: "Tính quãng đường h thực tế (tầng 1 lên 4 là 3 lầu).", explanation: "\\(h = 3 \\cdot 3,5 = 10,5\\text{ m}. A = 500 \\cdot 10,5 = 5250\\text{ J}.\\)" },
+  { id: "E_SA_7", question: "Một trái tim con người trung bình thực hiện một công 1,2 J trong mỗi nhịp đập. Nếu tim đập 75 nhịp trong một phút, công suất của tim là bao nhiêu Watt? (Ghi 1 chữ số thập phân).", answer: "1.5", hint: "P = A / t.", explanation: "\\(A = 1,2 \\cdot 75 = 90\\text{ J}. P = \\frac{90}{60} = 1,5\\text{ W}.\\)" },
+  { id: "E_SA_8", question: "Vận tốc của một vật có khối lượng 4kg khi động năng của nó là 50J bằng bao nhiêu m/s?", answer: "5", hint: "Rút v từ công thức động năng.", explanation: "\\(v = \\sqrt{\\frac{100}{4}} = 5\\text{ m/s}.\\)" },
+  { id: "E_SA_9", question: "Công của lực cản tác dụng lên xe khi xe đi được 10m là -200J. Lực cản có độ lớn bao nhiêu N?", answer: "20", hint: "F = |A| / s", explanation: "\\(F_c = 200 / 10 = 20\\text{ N}.\\)" },
+  { id: "E_SA_10", question: "Thả rơi 1 vật 2kg từ trên cao (g=10). Sau 3 giây chạm đất. Công của trọng lực là bao nhiêu J? (Biết h = 0.5*g*t²).", answer: "900", hint: "Tính h trước rồi tính A = P.h", explanation: "h = 0.5 * 10 * 9 = 45m. P = 20N. A = 20 * 45 = 900 J." },
+  { id: "E_SA_11", question: "Lực kéo đầu dây khi công thực hiện là 1000J và quãng đường kéo dây là 10m trên ròng rọc động bằng bao nhiêu N?", answer: "100", hint: "A = F * s_dây", explanation: "F = 1000 / 10 = 100 N." },
+  { id: "E_SA_12", question: "Một tảng đá 50kg. Người ta dùng bẩy nâng đá lên 10cm (0.1m). Bỏ qua hao phí, công sinh ra là bao nhiêu J?", answer: "50", hint: "Công cơ học nâng đá thẳng đứng.", explanation: "P = 500N. h = 0.1m. A = 500*0.1 = 50 J." },
+  { id: "E_SA_13", question: "Động cơ điện 220V - 1.5kW chạy trong 10 phút. Năng lượng tiêu thụ (tương đương công) là bao nhiêu kJ?", answer: "900", hint: "Đổi phút ra giây. Hoặc dùng P theo kW, t theo s / 1000.", explanation: "P = 1.5kW = 1500W. t = 600s. A = 1500 * 600 = 900000 J = 900 kJ." },
+  { id: "E_SA_14", question: "Hai con lắc A và B ở cùng độ cao. Khối lượng m_A = 2 m_B. Tỉ số thế năng (W_tA / W_tB) là bao nhiêu?", answer: "2", hint: "Thế năng tỉ lệ thuận khối lượng.", explanation: "Do h như nhau nên tỉ số thế năng bằng tỉ số khối lượng = 2." },
+  { id: "E_SA_15", question: "Vật m rơi tự do, cơ năng 500J. Ở độ cao mà thế năng bằng 300J thì vận tốc vật là 10m/s. Khối lượng vật là bao nhiêu kg?", answer: "4", hint: "Tìm W_đ rồi suy ra m.", explanation: "W_đ = 500 - 300 = 200J. 0.5*m*100 = 200 => m = 4 kg." },
+  { id: "E_SA_16", question: "Mặt phẳng nghiêng dài 5m, cao 1m. Vật nặng 1000N. Lực đẩy (không ma sát) là bao nhiêu N?", answer: "200", hint: "Bảo toàn công F.s = P.h", explanation: "F * 5 = 1000 * 1 => F = 200 N." },
+  { id: "E_SA_17", question: "Một vận động viên đạp xe sinh công suất 300W. Năng lượng tiêu tốn do cơ bắp thực tế lớn hơn công sinh ra (hiệu suất 20%). Tốc độ tiêu hao năng lượng cơ thể người đó là bao nhiêu W?", answer: "1500", hint: "Công suất toàn phần = Có ích / Hiệu suất.", explanation: "P_tp = 300 / 0.2 = 1500 W." },
+  { id: "E_SA_18", question: "Tàu điện chạy thẳng đều 15m/s với lực kéo 2000N. Tính công thực hiện trong 1 giờ (ra đơn vị MJ - MegaJoule)?", answer: "108", hint: "A = F*v*t", explanation: "P = 2000 * 15 = 30000 W. A = 30000 * 3600 = 108.000.000 J = 108 MJ." },
+  { id: "E_SA_19", question: "Bóng ném thẳng lên với Động năng ban đầu 15J, Thế năng 5J (điểm ném cách đất). Động năng khi chạm đất (bỏ qua cản) là bao nhiêu J?", answer: "20", hint: "Chạm đất thế năng bằng 0.", explanation: "Cơ năng = 15 + 5 = 20J. Tại đất W_t=0 nên W_đ = 20J." },
+  { id: "E_SA_20", question: "Một người xách cặp 10kg đi ngang 50m. Sau đó xách lên lầu cao 5m. Tổng công thực hiện là bao nhiêu J? (g=10)", answer: "500", hint: "Đi ngang công bằng 0.", explanation: "Đi ngang A=0. Lên lầu A = P.h = 100 * 5 = 500 J. Tổng = 500 J." }
+];
 
     // --- GAME STATE ---
     let state = {
@@ -754,7 +883,7 @@
      ===================================================================================== -->
 
 <!-- 1. HỘP THOẠI MODAL THÔNG BÁO TÙY CHỈNH (THAY THẾ CHỨC NĂNG ALERT/CONFIRM GỐC) -->
-<div id="sys-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.8); z-index:100002; backdrop-filter:blur(5px); align-items:center; justify-content:center;">
+<div id="sys-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.8); z-index:999999; backdrop-filter:blur(5px); align-items:center; justify-content:center;">
     <div id="sys-modal-box" style="background:white; padding:25px; border-radius:16px; max-width:400px; width:90%; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.3); transform: scale(0.9); transition: 0.2s;">
         <h3 id="sys-modal-title" style="color:#0f172a; margin-bottom:15px; font-size:1.3rem; font-weight:800;">Thông báo</h3>
         <p id="sys-modal-msg" style="color:#334155; margin-bottom:20px; font-size:1.05rem; line-height:1.6; white-space: pre-wrap;"></p>
@@ -779,8 +908,9 @@
             <span id="auth-feature-name" style="font-weight:800; color:#7f1d1d; font-size:0.95rem;">Tính năng...</span>
         </div>
         <label style="display:block; margin-bottom:8px; font-weight:600; font-size:0.9rem;">Nhập mật khẩu:</label>
-        <input type="password" id="admin-pass" style="width:100%; padding:12px; margin-bottom:15px; border:2px solid #cbd5e1; border-radius:8px; outline:none;" placeholder="Nhập mật khẩu của chức năng này...">
-        <button class="btn btn-primary" style="width:100%" onclick="checkAdminPass()">XÁC NHẬN</button>
+        <input type="password" id="admin-pass" style="width:100%; padding:12px; border:2px solid #cbd5e1; border-radius:8px; outline:none;" placeholder="Nhập mật khẩu của chức năng này...">
+        <div id="admin-auth-error" style="color: #ef4444; font-weight: bold; margin-top: 8px; margin-bottom: 12px; display: none; font-size: 0.9rem;"></div>
+        <button class="btn btn-primary" style="width:100%; margin-top: 10px;" onclick="checkAdminPass()">XÁC NHẬN</button>
         <button class="btn" style="width:100%; margin-top:10px; color:#64748b" onclick="cancelAdminAuth()">Hủy bỏ</button>
     </div>
     <div id="admin-tools" style="display:none;">
@@ -906,24 +1036,41 @@
     </div>
 </div>
 
-<!-- 5. GIAO DIỆN BẢNG DASHBOARD QUẢN LÝ MẬT KHẨU ĐỘC LẬP -->
+<!-- 5. GIAO DIỆN BẢNG DASHBOARD QUẢN LÝ MẬT KHẨU ĐỘC LẬP (LỊCH SỬ MẬT KHẨU) -->
 <div id="pass-dashboard-view" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #0b1120; z-index: 100001; overflow-y: auto; padding: 25px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
     <div class="db-container" style="max-width: 1000px;">
         <div class="db-header">
-            <h2 class="db-title"><span>🔐</span> QUẢN LÝ MẬT KHẨU CHỨC NĂNG</h2>
+            <h2 class="db-title"><span>🔐</span> LỊCH SỬ & QUẢN LÝ MẬT KHẨU</h2>
             <button class="db-btn-close" onclick="closePassDashboard()">THOÁT</button>
         </div>
+        
         <div style="background: #fffbeb; border-left: 5px solid #f59e0b; padding: 15px 20px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); color: #b45309; font-weight: 500;">
-            💡 <b>Lưu ý:</b> Bạn có thể đổi mật khẩu riêng cho từng tính năng. Mật khẩu ban đầu là <b>24072011</b> (trừ 2 chức năng mở hệ thống ở đầu là <b>112233@@</b>). Hệ thống sẽ tạo link mới chứa mật khẩu bạn vừa đổi.<br><br>🛡️ <b>ĐẶC QUYỀN BẢO VỆ:</b> Để tránh việc giáo viên trường khác đổi mật khẩu làm mất quyền của Ban quản trị, <b>Mật khẩu gốc ban đầu (112233@@ và 24072011) SẼ LUÔN LUÔN CÓ TÁC DỤNG</b> bất chấp link đó đã bị đổi thành mật khẩu gì!
+            💡 <b>Quy tắc Hệ thống:</b> Thầy có thể THÊM nhiều mật khẩu mới cho mỗi tính năng. Tất cả mật khẩu đã thêm và mật khẩu mặc định ban đầu đều CÓ HIỆU LỰC SỬ DỤNG.<br><br>
+            🛡️ <b>MẬT KHẨU TỐI CAO:</b> Để xóa các mật khẩu đã thêm, hệ thống sẽ yêu cầu Thầy nhập Mật khẩu Tối cao. Mật khẩu mặc định và mật khẩu tối cao không thể bị xóa!
         </div>
+
+        <!-- Khung Thêm Mật khẩu Mới -->
+        <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <div class="db-filter-group" style="flex-grow: 2;">
+                <label>Chọn Tính năng cần bổ sung mật khẩu:</label>
+                <select id="add-pass-feature"></select>
+            </div>
+            <div class="db-filter-group" style="flex-grow: 1;">
+                <label>Nhập mật khẩu mới:</label>
+                <input type="text" id="add-pass-input" placeholder="Tối thiểu 4 ký tự..." style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; font-weight: bold; font-size: 0.95rem;">
+            </div>
+            <button class="db-btn-filter db-btn-export" style="height: 40px; min-width: 150px;" onclick="addFeaturePass()">➕ THÊM MỚI</button>
+        </div>
+
+        <!-- Bảng Lịch sử Mật khẩu -->
         <div class="db-table-wrapper">
-            <table class="db-table" style="min-width: 600px;">
+            <table class="db-table">
                 <thead>
                     <tr>
+                        <th style="width: 10%; text-align:center;">STT</th>
                         <th style="width: 45%;">Tên Tính năng Bảo mật</th>
-                        <th style="width: 20%;">Mật khẩu Hiện tại</th>
-                        <th style="width: 20%;">Mật khẩu Mới</th>
-                        <th style="text-align:center; width: 15%;">Cập nhật</th>
+                        <th style="width: 30%; text-align:center;">Mật khẩu Đang Hoạt động</th>
+                        <th style="width: 15%; text-align:center;">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody id="pass-tbody">
@@ -937,8 +1084,6 @@
 <script>
     /* =========================================================================
         PHẦN LOGIC XỬ LÝ
-        (Bản hợp nhất Single-Script để diệt tận gốc lỗi kẹt bộ nhớ màn hình chờ)
-        Đã TÍCH HỢP Hệ thống máy chủ đám mây Cloud Storage để lưu trữ vĩnh viễn!
         ========================================================================= */
     
     // --- 1. TẠO HỘP THOẠI MODAL TÙY CHỈNH CHỐNG LỖI IFRAME ---
@@ -1075,12 +1220,12 @@
         }
     })();
 
-    // TÍCH HỢP QUYỀN ĐĂNG NHẬP ADMIN VÀ BIẾN MẬT KHẨU ĐỘC LẬP
+    // TÍCH HỢP QUYỀN ĐĂNG NHẬP ADMIN VÀ BIẾN MẬT KHẨU LỊCH SỬ ĐỘC LẬP
     
     // Khai báo mật khẩu Master "Bất tử" (Không thể xóa hay làm mất quyền)
     const hardcodedMaster = {
         'panel_access': '112233@@',
-        'master_pass': '112233@@',
+        'master_pass': 'ILOVETHUYPHUONG@@',
         'force_start': '24072011',
         'anti_cheat': '24072011',
         'timer': '24072011',
@@ -1090,27 +1235,19 @@
     };
 
     const defaultPasswords = {
-        'panel_access': urlParams.get('p_panel_access') || '112233@@',
-        'master_pass': urlParams.get('p_master_pass') || '112233@@',
-        'force_start': urlParams.get('p_force_start') || '24072011',
-        'anti_cheat': urlParams.get('p_anti_cheat') || '24072011',
-        'timer': urlParams.get('p_timer') || '24072011',
-        'max_score': urlParams.get('p_max_score') || '24072011',
-        'show_ans': urlParams.get('p_show_ans') || '24072011',
-        'sys_settings': urlParams.get('p_sys_settings') || '24072011'
+        'panel_access': '112233@@',
+        'master_pass': 'ILOVETHUYPHUONG@@',
+        'force_start': '24072011',
+        'anti_cheat': '24072011',
+        'timer': '24072011',
+        'max_score': '24072011',
+        'show_ans': '24072011',
+        'sys_settings': '24072011'
     };
     
-    window.featurePasswords = JSON.parse(localStorage.getItem('khtn9_feature_passes')) || {};
+    // CHUYỂN ĐỔI: Dùng Mảng (Array) để lưu lịch sử thay vì biến chuỗi đơn
+    window.featurePassHistory = JSON.parse(localStorage.getItem('khtn9_feature_passes_history')) || {};
     
-    // Auto-fill thiếu key nếu update version mới HOẶC lấy từ URL gốc
-    for(let k in defaultPasswords) {
-        if(urlParams.has('p_' + k)) {
-            window.featurePasswords[k] = urlParams.get('p_' + k);
-        } else if(!window.featurePasswords[k]) {
-            window.featurePasswords[k] = defaultPasswords[k];
-        }
-    }
-
     const featureNames = {
         'panel_access': '🚪 Mở bảng Điều khiển Quản trị',
         'master_pass': '🔐 Mật khẩu mở Bảng Quản lý Mật khẩu',
@@ -1121,6 +1258,22 @@
         'show_ans': '💡 Tiết lộ đáp án câu hiện tại',
         'sys_settings': '⚙️ Thay đổi Cài đặt (Đổi thời gian / Xóa / Sửa kết quả)'
     };
+
+    // Đảm bảo tất cả các key đều tồn tại dưới dạng mảng
+    for (let k in featureNames) {
+        if (!window.featurePassHistory[k]) window.featurePassHistory[k] = [];
+    }
+
+    // Auto-fill từ URL gốc vào Lịch sử (nếu URL chứa pass mới)
+    for(let k in defaultPasswords) {
+        if(urlParams.has('p_' + k)) {
+            const urlPass = urlParams.get('p_' + k);
+            if (!window.featurePassHistory[k].includes(urlPass) && urlPass !== defaultPasswords[k] && urlPass !== hardcodedMaster[k]) {
+                window.featurePassHistory[k].push(urlPass);
+            }
+        }
+    }
+    localStorage.setItem('khtn9_feature_passes_history', JSON.stringify(window.featurePassHistory));
 
     window.authenticatedFeatures = {};
     window.pendingFeatureKey = null;
@@ -1142,6 +1295,7 @@
             document.getElementById('auth-feature-name').innerText = featureNames[featureKey];
             
             document.getElementById('admin-pass').value = '';
+            document.getElementById('admin-auth-error').style.display = 'none';
             document.getElementById('admin-pass').focus();
         }
     }
@@ -1149,6 +1303,7 @@
     function cancelAdminAuth() {
         document.getElementById('admin-auth').style.display = 'none';
         document.getElementById('admin-pass').value = '';
+        document.getElementById('admin-auth-error').style.display = 'none';
         let feature = window.pendingFeatureKey;
         window.pendingAdminAction = null;
         window.pendingFeatureKey = null;
@@ -1165,10 +1320,14 @@
 
     function checkAdminPass() { 
         const pass = document.getElementById('admin-pass').value; 
-        const targetPass = window.featurePasswords[window.pendingFeatureKey];
         const masterPass = hardcodedMaster[window.pendingFeatureKey];
+        const defaultPass = defaultPasswords[window.pendingFeatureKey];
+        const historyArr = window.featurePassHistory[window.pendingFeatureKey] || [];
+        const errorSpan = document.getElementById('admin-auth-error');
         
-        if(pass === targetPass || pass === masterPass) {
+        // Chấp nhận nếu Khớp Mật khẩu tối cao, Mật khẩu mặc định, hoặc Nằm trong Lịch sử mật khẩu đã thêm
+        if(pass === masterPass || pass === defaultPass || historyArr.includes(pass)) {
+            errorSpan.style.display = 'none';
             window.authenticatedFeatures[window.pendingFeatureKey] = true;
             document.getElementById('admin-auth').style.display = 'none'; 
             document.getElementById('admin-panel').style.zIndex = '10000'; // Trả lại z-index
@@ -1190,7 +1349,8 @@
                 document.getElementById('admin-tools').style.display = 'block'; 
             }
         } else { 
-            showCustomAlert("Mật khẩu không chính xác!"); 
+            errorSpan.innerText = "❌ Mật khẩu không chính xác!";
+            errorSpan.style.display = 'block';
         } 
     }
 
@@ -1217,7 +1377,6 @@
         state.timer = setInterval(timerTick, 1000);
     }
 
-    // --- CHỈNH SỬA: TẠO LINK WEB MỚI KHI ĐỔI THỜI GIAN ---
     function applyTimeSetting() {
         requireFeatureAuth('sys_settings', () => {
             const newExamTime = parseInt(document.getElementById('db-time-exam').value);
@@ -1636,10 +1795,19 @@
         });
     }
 
-    // --- HỆ THỐNG QUẢN LÝ MẬT KHẨU TÁCH RỜI ---
+    // --- HỆ THỐNG QUẢN LÝ MẬT KHẨU TÁCH RỜI (CÓ LỊCH SỬ BỔ SUNG NHIỀU MK) ---
     function openPassDashboard() {
         closeAdmin(); 
         document.getElementById('pass-dashboard-view').style.display = 'block';
+        
+        // Đổ dữ liệu vào select-box
+        const selectBox = document.getElementById('add-pass-feature');
+        if(selectBox.options.length === 0) {
+            for (let key in featureNames) {
+                selectBox.options.add(new Option(featureNames[key], key));
+            }
+        }
+        document.getElementById('add-pass-input').value = '';
         renderPassTable();
     }
 
@@ -1650,67 +1818,106 @@
     function renderPassTable() {
         const tbody = document.getElementById('pass-tbody');
         tbody.innerHTML = '';
-        
+
+        let count = 1;
         for (let key in featureNames) {
-            let tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="font-weight:bold; color:#1e293b; padding: 12px;">${featureNames[key]}</td>
-                <td>
-                    <input type="password" id="old-pass-${key}" placeholder="Mật khẩu cũ" 
-                        style="width:100%; padding:8px 12px; border:1px solid #cbd5e1; border-radius:6px; outline:none;">
-                </td>
-                <td>
-                    <input type="password" id="new-pass-${key}" placeholder="Mật khẩu mới" 
-                        style="width:100%; padding:8px 12px; border:1px solid #cbd5e1; border-radius:6px; outline:none;">
-                </td>
-                <td style="text-align:center;">
-                    <button class="db-btn-filter db-btn-refresh" style="width: 100%;" onclick="changeFeaturePass('${key}')">Lưu</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
+            let historyArr = window.featurePassHistory[key] || [];
+            
+            if (historyArr.length > 0) {
+                historyArr.forEach(passVal => {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight:bold; text-align:center;">${count++}</td>
+                        <td style="font-weight:600; color:#1e293b;">${featureNames[key]}</td>
+                        <td style="text-align:center;">
+                            <span style="font-weight:bold; color:#16a34a; background:#dcfce7; border-radius:6px; border:1px solid #86efac; padding: 6px 12px; display:inline-block;">${passVal}</span>
+                        </td>
+                        <td style="text-align:center;">
+                            <div class="db-action-btns" style="justify-content: center;">
+                                <button class="db-btn-delete" style="width: 35px; height: 35px; font-size: 1.1rem; border-radius: 8px;" onclick="deleteFeaturePass('${key}', '${passVal}')" title="Xóa mật khẩu này (Yêu cầu Mật khẩu tối cao)">X</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+        
+        if(count === 1) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: #64748b; font-style: italic;">Chưa có mật khẩu bổ sung nào được thêm. Mọi tính năng đang dùng Mật khẩu Mặc định.</td></tr>`;
         }
     }
 
-    function changeFeaturePass(key) {
-        const oldP = document.getElementById(`old-pass-${key}`).value;
-        const newP = document.getElementById(`new-pass-${key}`).value;
-        const masterPass = hardcodedMaster[key];
-        
-        if (!oldP || !newP) {
-            showCustomAlert("Vui lòng nhập đủ mật khẩu cũ và mật khẩu mới để thay đổi!");
-            return;
-        }
-        
-        if (oldP !== window.featurePasswords[key] && oldP !== masterPass) {
-            showCustomAlert("Mật khẩu cũ bạn vừa nhập không khớp với mật khẩu hiện tại của chức năng này!");
-            return;
-        }
+    function addFeaturePass() {
+        const key = document.getElementById('add-pass-feature').value;
+        const newP = document.getElementById('add-pass-input').value.trim();
         
         if (newP.length < 4) {
-            showCustomAlert("Để đảm bảo an toàn, mật khẩu mới phải có ít nhất 4 ký tự!");
+            showCustomAlert("❌ Mật khẩu mới cần có ít nhất 4 ký tự để đảm bảo an toàn!");
             return;
         }
+
+        if (newP === hardcodedMaster[key] || newP === defaultPasswords[key]) {
+            showCustomAlert("❌ Mật khẩu này trùng với mật khẩu mặc định/tối cao của hệ thống. Không cần thiết phải thêm!");
+            return;
+        }
+
+        if (window.featurePassHistory[key].includes(newP)) {
+            showCustomAlert("❌ Mật khẩu này đã tồn tại trong lịch sử của tính năng này!");
+            return;
+        }
+
+        // Thêm vào mảng lịch sử và lưu LocalStorage
+        window.featurePassHistory[key].push(newP);
+        localStorage.setItem('khtn9_feature_passes_history', JSON.stringify(window.featurePassHistory));
         
-        // Cập nhật và Lưu bộ nhớ cục bộ
-        window.featurePasswords[key] = newP;
-        localStorage.setItem('khtn9_feature_passes', JSON.stringify(window.featurePasswords));
-        
-        // Xóa trường nhập liệu
-        document.getElementById(`old-pass-${key}`).value = '';
-        document.getElementById(`new-pass-${key}`).value = '';
-        
-        // Hủy session xác thực của chính chức năng đó
+        // Hủy xác thực cũ bắt đăng nhập lại bằng pass mới
         window.authenticatedFeatures[key] = false;
         
-        // --- Xử lý nối URL ---
+        // Xóa ô nhập liệu
+        document.getElementById('add-pass-input').value = '';
+
+        // Cập nhật URL để Giáo viên chia sẻ Link có sẵn pass mới nhất
         const currentUrl = new URL(window.location.href);
         currentUrl.searchParams.set('p_' + key, newP);
 
         try {
             window.history.pushState({path: currentUrl.toString()}, '', currentUrl.toString());
-            showCustomAlert("✅ ĐÃ CẬP NHẬT LINK WEB MẬT KHẨU MỚI THÀNH CÔNG!\n\nMật khẩu Thầy vừa đổi đã được gắn thẳng vào ĐƯỜNG LINK TRÊN THANH ĐỊA CHỈ hiện tại.\n\nThầy hãy NHẤP VÀO THANH ĐỊA CHỈ PHÍA TRÊN CÙNG và COPY link đó để lưu lại nhé!");
+            showCustomAlert(`✅ ĐÃ THÊM MẬT KHẨU MỚI THÀNH CÔNG!\n\nMật khẩu [ ${newP} ] đã được kích hoạt. Mật khẩu gốc/cũ vẫn dùng được.\n\nLink trên Thanh địa chỉ trình duyệt cũng đã được tự động cập nhật mật khẩu mới nhất này để Thầy copy!`);
+            renderPassTable();
         } catch(e) {
-            showCustomConfirm("Hệ thống đã chuẩn bị Link web mới có chứa mật khẩu vừa đổi.\n\nThầy có muốn Tải lại trang để kích hoạt Link mới này ngay bây giờ không?\n(Sau khi màn hình load lại, Thầy hãy copy link trên thanh địa chỉ nhé)", function(yes) {
+            showCustomConfirm("Đã thêm mật khẩu thành công. Thầy có muốn Tải lại trang để cập nhật Link web chứa pass mới này không?", function(yes) {
+                if(yes) window.location.href = currentUrl.toString();
+            });
+        }
+    }
+
+    function deleteFeaturePass(key, passToDel) {
+        const masterInput = prompt(`⚠️ XÓA MẬT KHẨU BỔ SUNG\nBạn đang muốn xóa mật khẩu [ ${passToDel} ]\n\nVui lòng nhập MẬT KHẨU TỐI CAO để xác nhận:` );
+        if (masterInput === null) return;
+
+        if (masterInput !== "ILOVETHUYPHUONG@@") {
+            showCustomAlert("❌ Mật khẩu tối cao không chính xác! Từ chối quyền xóa.");
+            return;
+        }
+
+        // Tiến hành xóa khỏi mảng
+        window.featurePassHistory[key] = window.featurePassHistory[key].filter(p => p !== passToDel);
+        localStorage.setItem('khtn9_feature_passes_history', JSON.stringify(window.featurePassHistory));
+        window.authenticatedFeatures[key] = false;
+
+        // Xóa pass này khỏi URL nếu nó đang nằm trên URL
+        const currentUrl = new URL(window.location.href);
+        if(currentUrl.searchParams.get('p_' + key) === passToDel) {
+             currentUrl.searchParams.delete('p_' + key);
+        }
+
+        try {
+            window.history.pushState({path: currentUrl.toString()}, '', currentUrl.toString());
+            renderPassTable();
+            showCustomAlert(`✅ ĐÃ XÓA MẬT KHẨU [ ${passToDel} ] THÀNH CÔNG!`);
+        } catch(e) {
+            showCustomConfirm("Đã xóa mật khẩu thành công. Thầy có muốn Tải lại trang để làm sạch Link web không?", function(yes) {
                 if(yes) window.location.href = currentUrl.toString();
             });
         }
